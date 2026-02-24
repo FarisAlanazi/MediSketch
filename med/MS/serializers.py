@@ -5,7 +5,7 @@ import re
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id', 'username', 'email', 'password', 'phone_number', 'address', 'user_type')
+        fields = ('id', 'username', 'email', 'password', 'phone_number', 'user_type')
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_phone_number(self, value):
@@ -18,13 +18,31 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class PatientSerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=True)
+
     class Meta:
         model = Patient
         fields = '__all__'
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = CustomUser.objects.create_user(**user_data, user_type='patient')
+        patient = Patient.objects.create(user=user, **validated_data)
+        return patient
+
 class DoctorSerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=True)
+
     class Meta:
         model = Doctor
         fields = '__all__'
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = CustomUser.objects.create_user(**user_data, user_type='doctor')
+        doctor = Doctor.objects.create(user=user, **validated_data)
+        return doctor
+
 class ClinicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clinic
