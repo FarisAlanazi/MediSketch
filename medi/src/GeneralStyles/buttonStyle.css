@@ -1,0 +1,48 @@
+/* btn 1 style*/
+
+.buttons {
+  width: 120px;
+  height: 50px;
+  border: 3px solid #4f6cd4;
+  border-radius: 45px;
+  transition: all 0.3s;
+  cursor: pointer;
+  background: white;
+  font-size: 1.2em;
+  font-weight: 550;
+  margin-right: 30px;
+}
+
+.buttons:hover {
+  background: #6175be;
+  color: white;
+  font-size: 1em;
+}
+
+.buttonForBook {
+  padding: 1.7em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #000;
+  background-color: #fff;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+}
+
+.buttonForBook:hover {
+  background-color: #23c483;
+  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.buttonForBook:active {
+  transform: translateY(-1px);
+}
+/*above made by Hamzah*/

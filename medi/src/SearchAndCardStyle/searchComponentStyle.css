@@ -1,0 +1,64 @@
+.container {
+  width: 100%;
+  display: flex;
+  margin-bottom: 70px;
+}
+.doctorImg {
+  width: 60%;
+  height: auto;
+  cursor: default;
+}
+.imgClass {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.divWithInput {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-wrap: wrap;
+  margin-left: 70px;
+}
+.divWithInput > input {
+  width: 500px;
+  height: 50px;
+  border-radius: 20px;
+  border: 1px solid black;
+  font-size: 25px;
+}
+#paragraph {
+  width: 500px;
+  font-size: 24px;
+}
+h1 > span {
+  color: rgb(89, 184, 221);
+}
+
+@media (max-width: 1250px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .doctorImg {
+    width: 100%;
+  }
+  .imgClass {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+  }
+
+  .divWithInput {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+  }
+  .divWithInput > input {
+    width: 250px;
+  }
+}
+/*Above made by HAMZAH*/
