@@ -98,32 +98,3 @@ MediSketch is a medical appointment booking system built with Django and Django 
             "years_of_experience": 15
         }
         ```
-
-## Uploading to GitHub (Main Branch)
-
-1.  **Initialize Git (if not already done):**
-    ```bash
-    git init
-    ```
-
-2.  **Add the remote repository:**
-    ```bash
-    git remote add origin https://github.com/FarisAlanazi/MediSketch.git
-    ```
-
-3.  **Add files to staging:**
-    ```bash
-    git add .
-    ```
-
-4.  **Commit changes:**
-    ```bash
-    git commit -m "Initial commit with backend logic"
-    ```
-
-5.  **Push to main branch:**
-    ```bash
-    git branch -M main
-    git push -u origin main
-    ```
-    *(If you encounter errors about unrelated histories or existing files, you might need to pull first: `git pull origin main --allow-unrelated-histories`)*
