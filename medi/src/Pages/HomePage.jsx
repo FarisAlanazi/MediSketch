@@ -12,7 +12,6 @@ const HomePage = () => {
         height: "100vh",
       }}
     >
-      <NavbarComponent />
       <SearchComponent />
       <div className="FeaturedSpecialists">
         <article className="cardArtical">
