@@ -16,7 +16,6 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
   };
-
   return (
     <section className="section-center">
       <h1 className="title">Register</h1>
