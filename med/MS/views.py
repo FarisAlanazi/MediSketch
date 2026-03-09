@@ -1,23 +1,48 @@
-from rest_framework import viewsets
+from django.conf import settings
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from .serializers import UserSerializer, DoctorSerializer, PatientSerializer, FeedbackSerializer
-from .models import CustomUser, Doctor, Patient, Feedback
+from .serializers import UserSerializer, DoctorSerializer, PatientSerializer, FeedbackSerializer, SpecializationSerializer
+from .models import CustomUser, Doctor, Patient, Feedback, Specialization
+
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
+        serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
+
+        response = Response({
             'user_id': user.pk,
             'user_type': user.user_type,
             'username': user.username
         })
+
+        response.set_cookie(
+            key='auth_token',
+            value=token.key,
+            httponly=True,
+            samesite='Lax',
+            secure=not settings.DEBUG  # Uses HTTPS in production
+        )
+        return response
+
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Delete the token from the database
+        request.user.auth_token.delete()
+
+        response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+        # Remove the cookie from the client
+        response.delete_cookie('auth_token')
+        return response
 
 class Doctor_view(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()
@@ -34,6 +59,11 @@ class Patient_view(viewsets.ModelViewSet):
 class Feedback_view(viewsets.ModelViewSet):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
+
+class Specialization_view(viewsets.ModelViewSet):
+    queryset = Specialization.objects.all()
+    serializer_class = SpecializationSerializer
+
 
 #login with token and logout
 #cookis Httponly_attr (from http.cookiejar import HTTPONLY_ATTR)

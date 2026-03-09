@@ -11,4 +11,5 @@ router.register(r'feedbacks', Feedback_view, basename='feedback')
 urlpatterns = [
     path('', include(router.urls)),
     path('api-token-auth/', CustomAuthToken.as_view(), name='api_token_auth'),
+    path('logout/', LogoutView.as_view(), name='api_logout'), # Added logout path
 ]
