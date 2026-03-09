@@ -40,3 +40,4 @@ class Feedback_view(viewsets.ModelViewSet):
 # clean the models and remove the redudant fields
 # orgnize the models with their relations and paths
 # specialization and clinic_name fix the api name not id
+
