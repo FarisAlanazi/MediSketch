@@ -141,6 +141,14 @@ ul {
   display: block;
   object-fit: cover;
 }
+
+.imgWithNoMargin {
+  width: 35%;
+  display: block;
+  object-fit: cover;
+  margin: 0;
+}
+
 /* buttons */
 
 .btn {

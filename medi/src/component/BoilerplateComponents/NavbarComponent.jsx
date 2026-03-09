@@ -14,7 +14,7 @@ function NavbarComponent() {
             <li style={{ marginRight: "30px" }}>Home</li>
           </Link>
           <li>
-            <a href="#Home"> Find Doctor</a>
+            <a href="findDoctor"> Find Doctor</a>
           </li>
           <li>
             <a href="/#doctors"> How it works</a>

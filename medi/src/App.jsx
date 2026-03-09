@@ -6,6 +6,7 @@ import NavbarComponent from "./component/BoilerplateComponents/NavbarComponent";
 import Register from "./component/RegisterComponent/Register";
 import { ToastContainer } from "react-toastify";
 import RegisterAsADoctor from "./component/RegisterComponent/RegisterAsADoctor";
+import Doctors from "./component/FindDoctorPage/Doctors";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/register/doctor" element={<RegisterAsADoctor />} />
+        <Route path="/findDoctor" element={<Doctors/>}/>
       </Routes>
     </>
   );
