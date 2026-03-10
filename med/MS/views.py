@@ -27,7 +27,7 @@ class CustomAuthToken(ObtainAuthToken):
             value=token.key,
             httponly=True,
             samesite='Lax',
-            secure=not settings.DEBUG  # Uses HTTPS in production
+            secure=not settings.DEBUG
         )
         return response
 

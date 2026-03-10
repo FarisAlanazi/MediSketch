@@ -89,3 +89,4 @@ def create_user_profile(sender, instance, created, **kwargs):
             Doctor.objects.create(user=instance)
         elif instance.user_type == 'patient':
             Patient.objects.create(user=instance)
+

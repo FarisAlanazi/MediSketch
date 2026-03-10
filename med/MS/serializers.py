@@ -22,7 +22,6 @@ class PatientSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        # Force the user_type into the dictionary to avoid duplicate kwargs
         user_data['user_type'] = 'patient'
         user = CustomUser.objects.create_user(**user_data)
         patient = Patient.objects.create(user=user, **validated_data)
@@ -31,7 +30,6 @@ class PatientSerializer(serializers.ModelSerializer):
 
 class DoctorSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
-    # This allows the API to accept/return the specialization name instead of the ID
     specialization = serializers.SlugRelatedField(
         slug_field='name',
         queryset=Specialization.objects.all()
@@ -43,7 +41,6 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        # Force the user_type into the dictionary to avoid duplicate kwargs
         user_data['user_type'] = 'doctor'
         user = CustomUser.objects.create_user(**user_data)
         doctor = Doctor.objects.create(user=user, **validated_data)
