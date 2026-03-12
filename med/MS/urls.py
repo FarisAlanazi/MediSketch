@@ -7,9 +7,13 @@ router.register(r'users', User_view, basename='user')
 router.register(r'doctors', Doctor_view, basename='doctor')
 router.register(r'patients', Patient_view, basename='patient')
 router.register(r'feedbacks', Feedback_view, basename='feedback')
+router.register(r'specializations', Specialization_view, basename='specialization')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('api-token-auth/', CustomAuthToken.as_view(), name='api_token_auth'),
-    path('logout/', LogoutView.as_view(), name='api_logout'), # Added logout path
+    # Anyone can access this view to get the CSRF cookie
+    path('csrf/', GetCSRFToken.as_view(), name='api_csrf'),
+    # Authentication views for login and logout
+    path('login/', LoginView.as_view(), name='api_login'),
+    path('logout/', LogoutView.as_view(), name='api_logout'),
 ]

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Patient, Doctor, Clinic, Available, Appointment, Specialization, Feedback, CustomUser
 import re
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -13,38 +14,32 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Phone number must be entered in the format: '+966500000000'")
         return value
 
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(**validated_data)
+        return user
+
+
 class PatientSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Patient
         fields = '__all__'
 
-    def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data['user_type'] = 'patient'
-        user = CustomUser.objects.create_user(**user_data)
-        patient = Patient.objects.create(user=user, **validated_data)
-        return patient
-
 
 class DoctorSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=True)
+    user = UserSerializer(read_only=True)
+
     specialization = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=Specialization.objects.all()
+        queryset=Specialization.objects.all(),
+        allow_null=True,
+        required=False
     )
 
     class Meta:
         model = Doctor
         fields = '__all__'
-
-    def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data['user_type'] = 'doctor'
-        user = CustomUser.objects.create_user(**user_data)
-        doctor = Doctor.objects.create(user=user, **validated_data)
-        return doctor
 
 
 class ClinicSerializer(serializers.ModelSerializer):
@@ -52,20 +47,24 @@ class ClinicSerializer(serializers.ModelSerializer):
         model = Clinic
         fields = '__all__'
 
+
 class AvailableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Available
         fields = '__all__'
+
 
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = '__all__'
 
+
 class SpecializationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Specialization
         fields = '__all__'
+
 
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
