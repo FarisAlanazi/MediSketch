@@ -1,13 +1,17 @@
 import { useState } from "react";
 import "../../GeneralStyles/GeneralStyles.css";
 import { Link } from "react-router-dom";
-import RegisterAsADoctor from "./RegisterAsADoctor";
+import Registration from "../../Auth/RegistrationLogic";
+
 function Register() {
   const [user, setUser] = useState({
-    Fname: "",
-    Lname: "",
-    phone: "",
+    first_name: "",
+    last_name: "",
+    phone_number: "",
     password: "",
+    username: "",
+    email: "",
+    user_type: "patient",
   });
 
   const handleChange = (e) => {
@@ -15,33 +19,35 @@ function Register() {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
+    Registration({ ...user });
   };
+
   return (
     <section className="section-center">
       <h1 className="title">Register</h1>
       <form onSubmit={handleSubmit} className="form">
-        <label htmlFor="Fname" className="form-label">
+        <label htmlFor="first_name" className="form-label">
           First Name
         </label>
         <input
-          id="Fname"
-          name="Fname"
+          id="first_name"
+          name="first_name"
           className="form-input form-row"
           type="text"
           placeholder="First Name"
-          value={user.Fname}
+          value={user.first_name}
           onChange={handleChange}
         />
-        <label htmlFor="Lname" className="form-label">
+        <label htmlFor="last_name" className="form-label">
           Last Name
         </label>
         <input
-          id="Lname"
-          name="Lname"
+          id="last_name"
+          name="last_name"
           className="form-input form-row"
           type="text"
           placeholder="Last Name"
-          value={user.Lname}
+          value={user.last_name}
           onChange={handleChange}
         />
         <label htmlFor="phone" className="form-label">
@@ -49,14 +55,38 @@ function Register() {
         </label>
         <input
           id="phone"
-          name="phone"
+          name="phone_number"
           className="form-input form-row"
-          type="text"
+          type="number"
           placeholder="+966"
-          value={user.phone}
+          value={user.phone_number}
+          onChange={handleChange}
+        />
+        <label htmlFor="phone" className="form-label">
+          email
+        </label>
+        <input
+          id="email"
+          name="email"
+          className="form-input form-row"
+          type="email"
+          placeholder="example@example.com"
+          value={user.email}
           onChange={handleChange}
         />
 
+        <label htmlFor="phone" className="form-label">
+          Username
+        </label>
+        <input
+          id="username"
+          name="username"
+          className="form-input form-row"
+          type="text"
+          placeholder="Hamzah_Alanazi"
+          value={user.username}
+          onChange={handleChange}
+        />
         <label htmlFor="password"> Password</label>
         <input
           className="form-input form-row"

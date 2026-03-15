@@ -1,21 +1,37 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../GeneralStyles/GeneralStyles.css";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
+
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginData, setLogInData] = useState({
+    username: "",
+    password: "",
+  });
 
-  const handleSubmit = (e) => {
-    //validation
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setLogInData({ ...loginData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password.length < 8 || username.length < 3) {
-      toast.error("Password or username is invalid");
-      return;
-    }
 
-    // else{
-    //   //post to the server and redirect
-    // }
+    try {
+      const loginvalidation = await login(loginData);
+      if (loginvalidation.status === 200) {
+        toast.success("Logged in");
+        navigate("/");
+      } else {
+        return;
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Invalid username or password");
+    }
   };
 
   return (
@@ -27,20 +43,24 @@ function Login() {
         </label>
         <input
           id="username"
+          name="username"
           className="form-input form-row"
           type="text"
           placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={loginData.username}
+          onChange={handleChange}
         />
-        <label htmlFor="password"> Password</label>
+
+        <label htmlFor="password">Password</label>
         <input
           className="form-input form-row"
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={loginData.password}
+          onChange={handleChange}
         />
+
         <button type="submit" className="btn btn-block">
           Login
         </button>

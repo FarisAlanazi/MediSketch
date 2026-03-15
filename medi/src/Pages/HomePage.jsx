@@ -2,7 +2,7 @@ import NavbarComponent from "../component/BoilerplateComponents/NavbarComponent"
 import Footer from "../component/BoilerplateComponents/Footer";
 import SearchComponent from "../component/homePageComponents/SearchComponent";
 import CardsComponent from "../component/homePageComponents/CardsComponent";
-
+import { Link } from "react-router-dom";
 const HomePage = () => {
   return (
     <div
@@ -18,8 +18,9 @@ const HomePage = () => {
           <h1>Featured Specialists</h1>
           <p>Top rated doctors for immediate booking</p>
         </article>
-
-        <a href="viewAll"> View All Doctors {"  >"} </a>
+        <h4>
+          <Link to="/viweAll">View All Doctors</Link>
+        </h4>
       </div>
       <CardsComponent />
       <Footer />
