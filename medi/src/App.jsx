@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 import RegisterAsADoctor from "./component/RegisterComponent/RegisterAsADoctor";
 import Doctors from "./component/FindDoctorPage/Doctors";
 import RouteProtection from "./component/protectRoutes/RouteProtection";
-
+import UserProfile from "./component/ProfileComponent/userProfile";
 function App() {
   return (
     <>
@@ -27,6 +27,15 @@ function App() {
           element={
             <RouteProtection>
               <Doctors />
+            </RouteProtection>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <RouteProtection>
+              <UserProfile />
             </RouteProtection>
           }
         />

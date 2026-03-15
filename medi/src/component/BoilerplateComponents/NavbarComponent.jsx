@@ -37,10 +37,12 @@ function NavbarComponent() {
           </li>
         </ul>
 
-        <section>
+        <section className="section-log">
           {isAuthenticated ? (
             <>
-              <h4>{user?.username}</h4>
+              <h4>
+                <Link to="/profile">{user?.username}</Link>
+              </h4>
               <button onClick={handleLogout} className="buttons">
                 Logout
               </button>

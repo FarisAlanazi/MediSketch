@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import api, { getCSRFToken } from "../Auth/LoginLogic";
 
 const authContext = createContext();
@@ -8,6 +8,43 @@ function AuthProvider({ children }) {
     const savedUser = sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
+  const [loading, setLoading] = useState(true);
+
+  // const checkAuthentication = async () => {
+  //   try {
+  //     const res = await api.get("/me/");
+  //     setUser(res.data);
+  //     console.log(user.data, "user data");
+  //   } catch (err) {
+  //     console.log(err);
+  //     setUser(null);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   checkAuthentication();
+  // }, []);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await getCSRFToken();
+        const res = await api.get("/me/");
+
+        setUser(res.data);
+        localStorage.setItem("user", JSON.stringify(res.data));
+      } catch (error) {
+        setUser(null);
+        localStorage.removeItem("user");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const login = async (credentials) => {
     await getCSRFToken();
@@ -65,19 +102,3 @@ export function useAuth() {
 
 export default AuthProvider;
 // const [loading, setLoading] = useState(true);
-
-// const checkAuthentication = async () => {
-//   try {
-//     const res = await api.get("/me/");
-//     setUser(res.data);
-//   } catch (err) {
-//     console.log(err);
-//     setUser(null);
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-
-// useEffect(() => {
-//   checkAuthentication();
-// }, []);

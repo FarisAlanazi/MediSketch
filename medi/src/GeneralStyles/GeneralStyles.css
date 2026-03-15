@@ -333,4 +333,15 @@ ul {
   margin-bottom: 2rem;
 }
 
+.section-log {
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
+}
+
+.section-log > h4 {
+  margin-right: 30px;
+  text-align: center;
+}
 /*All above CSS code is written and Collected through previous projects by HAMZAH */
