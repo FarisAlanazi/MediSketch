@@ -41,7 +41,7 @@ function NavbarComponent() {
           {isAuthenticated ? (
             <>
               <h4>
-                <Link to="/profile">{user?.username}</Link>
+                <Link to="/account">{user?.username}</Link>
               </h4>
               <button onClick={handleLogout} className="buttons">
                 Logout

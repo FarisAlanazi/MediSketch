@@ -1,7 +1,8 @@
 import React from "react";
-import api, { getCSRFToken } from "../../Auth/LoginLogic";
+import api, { getCSRFToken } from "../../../Auth/LoginLogic";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import MainBar from "./MainBar";
 
 function UserProfile() {
   const [userInfo, setUserInfo] = useState({
@@ -57,7 +58,7 @@ function UserProfile() {
   };
 
   return (
-    <div>
+    <div className="section-center">
       <form className="form" onSubmit={handleSubmission}>
         {/* <label htmlFor="username" className="form-label">
           Username

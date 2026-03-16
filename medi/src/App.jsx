@@ -8,7 +8,10 @@ import { ToastContainer } from "react-toastify";
 import RegisterAsADoctor from "./component/RegisterComponent/RegisterAsADoctor";
 import Doctors from "./component/FindDoctorPage/Doctors";
 import RouteProtection from "./component/protectRoutes/RouteProtection";
-import UserProfile from "./component/ProfileComponent/userProfile";
+import UserProfile from "./component/ProfileComponent/menuBAR_Elements/UserProfile";
+import MainBar from "./component/ProfileComponent/menuBAR_Elements/MainBar";
+import Appointments from "./component/ProfileComponent/menuBAR_Elements/appointments";
+import Pending from "./component/ProfileComponent/menuBAR_Elements/Pending";
 function App() {
   return (
     <>
@@ -32,13 +35,38 @@ function App() {
         />
 
         <Route
-          path="/profile"
+          path="account"
           element={
             <RouteProtection>
-              <UserProfile />
+              <MainBar />
             </RouteProtection>
           }
-        />
+        >
+          <Route
+            path="profile"
+            element={
+              <RouteProtection>
+                <UserProfile />
+              </RouteProtection>
+            }
+          />
+          <Route
+            path="MyAppointments"
+            element={
+              <RouteProtection>
+                <Appointments />
+              </RouteProtection>
+            }
+          />
+          <Route
+            path="Pending"
+            element={
+              <RouteProtection>
+                <Pending />
+              </RouteProtection>
+            }
+          />
+        </Route>
       </Routes>
     </>
   );
