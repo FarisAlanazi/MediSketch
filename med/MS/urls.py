@@ -16,4 +16,6 @@ urlpatterns = [
     # Authentication views for login and logout
     path('login/', LoginView.as_view(), name='api_login'),
     path('logout/', LogoutView.as_view(), name='api_logout'),
+path("me/", CurrentUserView.as_view(), name="current-user"),
+path("profile/me/", CurrentUserProfileView.as_view(), name="current-user-profile"),
 ]

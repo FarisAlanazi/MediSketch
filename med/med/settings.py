@@ -49,8 +49,19 @@ MIDDLEWARE = [
 ]
 
 
-CORS_ALLOW_ALL_ORIGINS = True
-#CORS_ALLOW_CREDENTIALS = True
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
 
 ROOT_URLCONF = 'med.urls'
 
@@ -107,3 +118,6 @@ STATIC_URL = 'static/'
 # Custom User Model
 AUTH_USER_MODEL = 'MS.CustomUser'
 
+SESSION_COOKIE_AGE = 1209600  #cookie age
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False #self explination
+SESSION_SAVE_EVERY_REQUEST = True # every request exceeds session's life
