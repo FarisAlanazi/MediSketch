@@ -12,6 +12,9 @@ import UserProfile from "./component/ProfileComponent/menuBAR_Elements/UserProfi
 import MainBar from "./component/ProfileComponent/menuBAR_Elements/MainBar";
 import Appointments from "./component/ProfileComponent/menuBAR_Elements/appointments";
 import Pending from "./component/ProfileComponent/menuBAR_Elements/Pending";
+import AccountEntryContext from "./context/AccountEntryContext";
+import DoctorMainBar from "./component/ProfileComponent/DoctorProfile/DoctorMainBar";
+import DoctorProfile from "./component/ProfileComponent/DoctorProfile/DoctorProfile";
 function App() {
   return (
     <>
@@ -34,6 +37,7 @@ function App() {
           }
         />
 
+        <Route path="/entry" element={<AccountEntryContext />} />
         <Route
           path="account"
           element={
@@ -42,6 +46,7 @@ function App() {
             </RouteProtection>
           }
         >
+          <Route index element={<UserProfile />} />
           <Route
             path="profile"
             element={
@@ -66,6 +71,17 @@ function App() {
               </RouteProtection>
             }
           />
+        </Route>
+
+        <Route
+          path="/doctor"
+          element={
+            <RouteProtection>
+              <DoctorMainBar />
+            </RouteProtection>
+          }
+        >
+          <Route path="profile" element={<DoctorProfile />} />
         </Route>
       </Routes>
     </>

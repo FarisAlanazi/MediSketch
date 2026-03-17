@@ -7,12 +7,12 @@ import Loading from "../../Loading";
 const CardsComponent = () => {
   const [cardElements, setCardElements] = useState([]); // best 6 doctors
   const [isLoading, setIsLoading] = useState(true);
-
   const fetchData = async () => {
     try {
       const res = await api.get("/doctors/");
+
       setCardElements(res.data.slice(0, 6));
-      console.log(res.data);
+      console.log(res.data[0]);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -32,7 +32,16 @@ const CardsComponent = () => {
     <div className="cardsDiv">
       <div className="card-container">
         {cardElements.map((cardInfo, index) => (
-          <Cards key={index} {...cardInfo} />
+          <Cards
+            key={cardInfo.id || index}
+            first_name={cardInfo.user.first_name}
+            last_name={cardInfo.user.last_name}
+            age={cardInfo.user.age}
+            clinic={cardInfo.clinic}
+            price={cardInfo.price}
+            experience={cardInfo.years_of_experience}
+            specialization={cardInfo.specialization}
+          />
         ))}
       </div>
     </div>

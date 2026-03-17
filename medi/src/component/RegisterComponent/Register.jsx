@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../../GeneralStyles/GeneralStyles.css";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Registration from "../../Auth/RegistrationLogic";
 
 function Register() {

@@ -2,12 +2,14 @@ import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import api from "./Loginlogic";
+import { Navigate } from "react-router-dom";
 async function Registration(user) {
   try {
     const response = await api.post("/users/", user);
 
     if (response.status === 201 || response.status === 200) {
       toast.success("your account has been created");
+
       return response.data;
     }
 

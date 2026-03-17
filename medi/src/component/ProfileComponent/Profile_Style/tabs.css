@@ -5,8 +5,8 @@ ul {
 }
 
 .section {
-  width: 80vw;
-  max-width: var(--fixed-width);
+  width: 93vw;
+  max-width: 100%;
   background: var(--white);
   border-radius: var(--borderRadius);
   box-shadow: var(--shadow-2);
@@ -36,4 +36,10 @@ ul {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.center-div {
+  width: 93vw;
+  max-width: 56rem;
+  margin: 4rem auto;
 }

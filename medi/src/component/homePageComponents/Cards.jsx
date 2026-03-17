@@ -1,4 +1,11 @@
-const Cards = ({ name, address, gender, img }) => {
+const Cards = ({
+  first_name,
+  last_name,
+  price,
+  gender,
+  img,
+  specialization,
+}) => {
   const imgSrc =
     img ||
     "../../assets/imgs/doctor-with-his-arms-crossed-white-background.jpg";
@@ -7,10 +14,10 @@ const Cards = ({ name, address, gender, img }) => {
       <div className="card">
         <img src={imgSrc} alt="Doctor" />
         <section>
-          <h2>{name}</h2>
-          <h4>{address}</h4>
+          <h4>{`${first_name} ${last_name}`}</h4>
+          <p>{price}</p>
           <section>
-            <h3></h3>
+            <h3>{specialization}</h3>
             <h3>{gender}</h3>
           </section>
         </section>

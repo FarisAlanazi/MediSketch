@@ -101,4 +101,3 @@ export function useAuth() {
 }
 
 export default AuthProvider;
-// const [loading, setLoading] = useState(true);
