@@ -16,4 +16,6 @@ urlpatterns = [
     # Authentication views for login and logout
     path('login/', LoginView.as_view(), name='api_login'),
     path('logout/', LogoutView.as_view(), name='api_logout'),
+    # Check if the user is logged in and get their session info
+    path('me/', CheckSessionView.as_view(), name='check_session'),
 ]

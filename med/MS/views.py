@@ -47,7 +47,7 @@ class LoginView(APIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def get(self, request):
         #deletes the session from the database and clears the cookie
         logout(request)
         return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
@@ -71,6 +71,15 @@ class Doctor_view(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+class Doctor_view(viewsets.ModelViewSet):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+
 class Patient_view(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
@@ -81,10 +90,25 @@ class Patient_view(viewsets.ModelViewSet):
 class Feedback_view(viewsets.ModelViewSet):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
 
 class Specialization_view(viewsets.ModelViewSet):
     queryset = Specialization.objects.all()
     serializer_class = SpecializationSerializer
     permission_classes = [IsAuthenticated]
+
+
+# frontend call to check if the user is logged in and get their info
+class CheckSessionView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        return Response({
+            "username": request.user.username,
+            "user_type": request.user.user_type,
+        })
+
+

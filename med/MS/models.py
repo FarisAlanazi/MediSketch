@@ -18,8 +18,10 @@ class CustomUser(AbstractUser):
 class Clinic(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
-    phone = models.CharField(max_length=10)
-    email = models.EmailField(max_length=100) # Updated to EmailField
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    phone = models.CharField(max_length=10, null=True, blank=True)
+    email = models.EmailField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -52,6 +54,7 @@ class Doctor(models.Model):
     Med_id = models.CharField(max_length=20, null=True, blank=True)
     about_me = models.TextField(max_length=250, null=True, blank=True)
     years_of_experience = models.IntegerField(null=True, blank=True)
+    #picture = models.ImageField(upload_to='put your path of img here', null=True, blank=True)
 
     def __str__(self):
         return f"Dr. {self.user.first_name} {self.user.last_name}"
@@ -76,7 +79,13 @@ class Feedback(models.Model):
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     feedback = models.CharField(max_length=250)
-    rating = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='rating')
+    rate1 = 1
+    rate2 = 2
+    rate3 = 3
+    rate4 = 4
+    rate5 = 5
+    choices = [(rate1, '1'), (rate2, '2'), (rate3, '3'), (rate4, '4'), (rate5, '5')]
+    rating = models.IntegerField(choices=choices)
     def __str__(self):
         return self.appointment.patient.first_name
 
@@ -87,4 +96,3 @@ def create_user_profile(sender, instance, created, **kwargs):
             Doctor.objects.create(user=instance)
         elif instance.user_type == 'patient':
             Patient.objects.create(user=instance)
-
