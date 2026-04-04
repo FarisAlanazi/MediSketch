@@ -107,6 +107,7 @@ class CheckSessionView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         return Response({
+            id: res.data.user_id,
             "username": request.user.username,
             "user_type": request.user.user_type,
         })
