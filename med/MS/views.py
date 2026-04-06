@@ -5,10 +5,10 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from .serializers import UserSerializer, DoctorSerializer, PatientSerializer, FeedbackSerializer, \
-    SpecializationSerializer
-from .models import CustomUser, Doctor, Patient, Feedback, Specialization
+    SpecializationSerializer, AvailableSerializer, AppointmentSerializer
+from .models import CustomUser, Doctor, Patient, Feedback, Specialization, Available, Appointment
 
 
 # frontend call to get the CSRF cookie
@@ -68,12 +68,8 @@ class User_view(viewsets.ModelViewSet):
 class Doctor_view(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
-    permission_classes = [IsAuthenticated]
+    lookup_field = 'user'
 
-
-class Doctor_view(viewsets.ModelViewSet):
-    queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
@@ -83,6 +79,7 @@ class Doctor_view(viewsets.ModelViewSet):
 class Patient_view(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
+    lookup_field = 'user'
     permission_classes = [IsAuthenticated]
 
 
@@ -111,5 +108,56 @@ class CheckSessionView(APIView):
             "username": request.user.username,
             "user_type": request.user.user_type,
         })
+
+
+class Available_view(viewsets.ModelViewSet):
+    serializer_class = AvailableSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.user_type == 'doctor':
+            return Available.objects.filter(doctor__user=user)
+        elif user.user_type == 'patient':
+            return Available.objects.filter(status=True)
+        return Available.objects.none()
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.user_type != 'doctor':
+            raise PermissionDenied("Only doctors can create available times.")
+        doctor_profile = user.doctor_profile
+        serializer.save(doctor=doctor_profile)
+
+
+class Appointment_view(viewsets.ModelViewSet):
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        user = self.request.user
+        if user.user_type == 'patient':
+            return Appointment.objects.filter(patient__user=user)
+        elif user.user_type == 'doctor':
+            return Appointment.objects.filter(doctor__user=user)
+        return Appointment.objects.none()
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.user_type != 'patient':
+            raise PermissionDenied("Only patients can book appointments.")
+        patient_profile = user.patient_profile
+        doctor = serializer.validated_data.get('doctor')
+        date = serializer.validated_data.get('date')
+        time = serializer.validated_data.get('time')
+        available_slot = Available.objects.filter(
+            doctor=doctor,
+            date=date,
+            time=time,
+            status=True
+        ).first()
+        if not available_slot:
+            raise ValidationError({"detail": "This time slot is not available or has already been booked."})
+        available_slot.status = False
+        available_slot.save()
+        serializer.save(patient=patient_profile, status=True)
 
 

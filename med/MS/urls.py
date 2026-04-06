@@ -8,6 +8,8 @@ router.register(r'doctors', Doctor_view, basename='doctor')
 router.register(r'patients', Patient_view, basename='patient')
 router.register(r'feedbacks', Feedback_view, basename='feedback')
 router.register(r'specializations', Specialization_view, basename='specialization')
+router.register(r'available', Available_view, basename='available')
+router.register(r'appointments', Appointment_view, basename='appointment')
 
 urlpatterns = [
     path('', include(router.urls)),
