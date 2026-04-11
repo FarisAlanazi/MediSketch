@@ -6,7 +6,7 @@ function DoctorAppointments() {
     <div className="section-center ">
       <section className="form ">
         <div className="appointment ">
-          <h1>Doctor's Appointments</h1>
+          <h1>Patients </h1>
           <FaRegCalendarCheck size={30} />
         </div>
       </section>

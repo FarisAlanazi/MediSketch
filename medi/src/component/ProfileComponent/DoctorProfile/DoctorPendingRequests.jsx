@@ -6,7 +6,7 @@ function DoctorPendingRequests() {
     <div className="section-center">
       <section className="form">
         <div className="appointment">
-          <h1 className="pending">Pending</h1>
+          <h1 className="pending">Pending Requests</h1>
           <FaClock size={30} />
         </div>
       </section>

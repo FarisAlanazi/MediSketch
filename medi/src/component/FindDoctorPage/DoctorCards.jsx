@@ -1,21 +1,36 @@
 import img from "../../assets/doctor-with-his-arms-crossed-white-background.jpg";
 import "../../GeneralStyles/GeneralStyles.css";
-export default function DoctorCards({ name, price, special }) {
+import { Link } from "react-router-dom";
+export default function DoctorCards({
+  firstname,
+  price = "0",
+  special = "none",
+  lastname,
+  gender,
+  experience = " none",
+  id,
+}) {
   return (
     <div className="form" style={{ display: "flex" }}>
       <div className="img">
         <img src={img} alt="" className="imgWithNoMargin" />
       </div>
       <div className="">
-        <h3>Name</h3>
-        <h4>
-          <span>Special</span>
-        </h4>
+        <h5>
+          {firstname} {lastname}
+        </h5>
+        <h5>
+          <span>{special}</span>
+        </h5>
 
-        <h4>experience</h4>
-        <p className="price"> 120$</p>
+        <p>{experience} years of experience</p>
+        <p className="price"> ${price}</p>
+        <p className="gender"> {gender}</p>
       </div>
-      <button className="btn ">View</button>
+
+      <Link to={`/DoctorDetails/${id}`}>
+        <button className="btn ">View</button>
+      </Link>
     </div>
   );
 }

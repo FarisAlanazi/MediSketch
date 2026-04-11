@@ -1,0 +1,29 @@
+.calendarContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 40px;
+}
+
+.calendarStyles {
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 9px 9px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: box-shadow 0.3s ease;
+}
+
+.calendarStyles:hover {
+  box-shadow: 0 12px 12px rgba(0, 0, 0, 0.4);
+}
+
+.gridSystemDoctorDetails {
+  display: grid;
+  grid-template-columns: 0.85fr;
+  gap: 20px;
+  padding: 20px;
+}

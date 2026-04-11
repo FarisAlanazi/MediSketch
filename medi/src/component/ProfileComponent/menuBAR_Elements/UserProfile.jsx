@@ -23,7 +23,7 @@ function UserProfile() {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await api.get("/profile/me/");
+        const res = await api.get("/me/");
         if (res.data) {
           const profileData = {
             first_name: res.data.first_name ?? "",
@@ -50,7 +50,7 @@ function UserProfile() {
     await getCSRFToken();
 
     try {
-      await api.patch("/profile/me/", userInfo);
+      await api.patch("/me/", userInfo);
       toast.success("Profile edited successfully");
     } catch (err) {
       toast.error("something went wrong", err);

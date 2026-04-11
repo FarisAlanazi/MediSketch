@@ -1,0 +1,34 @@
+.reviewsContainer {
+  margin-top: 2rem;
+}
+
+.review {
+  background: var(--white);
+  border-radius: var(--borderRadius);
+  box-shadow: var(--shadow-2);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.review-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.review-name {
+  font-weight: bold;
+  font-size: var(--medium-text);
+}
+.review-rating {
+  margin-left: auto;
+  color: var(--primary-500);
+}
+.review-comment {
+  font-size: var(--small-text);
+  color: var(--gray-700);
+}
+.review-date {
+  font-size: var(--small-text);
+  color: var(--gray-500);
+  margin-top: 0.5rem;
+}

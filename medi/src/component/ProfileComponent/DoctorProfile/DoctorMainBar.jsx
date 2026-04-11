@@ -13,7 +13,7 @@ function DoctorMainBar() {
         <ul>
           <Link to="/doctor/profile">
             <li className="profileLI">
-              Profile
+              Doctor Info
               <span>
                 <FaUserAlt size={20} />
               </span>
@@ -21,7 +21,7 @@ function DoctorMainBar() {
           </Link>
           <Link to={"/doctor/appointments"}>
             <li className="profileLI">
-              Appointments{" "}
+              Today's Schedule{" "}
               <span>
                 {" "}
                 <MdEventAvailable size={20} />
@@ -30,7 +30,7 @@ function DoctorMainBar() {
           </Link>
           <Link to="/doctor/pending-requests">
             <li className="profileLI">
-              Pending{" "}
+              Requests{" "}
               <span>
                 <CiClock2 size={20} />
               </span>

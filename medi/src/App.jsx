@@ -1,4 +1,3 @@
-import React from "react";
 import HomePage from "./Pages/HomePage";
 import Login from "./component/LoginComponents/Login";
 import { Route, Routes, Link } from "react-router-dom";
@@ -15,6 +14,11 @@ import Pending from "./component/ProfileComponent/menuBAR_Elements/Pending";
 import AccountEntryContext from "./context/AccountEntryContext";
 import DoctorMainBar from "./component/ProfileComponent/DoctorProfile/DoctorMainBar";
 import DoctorProfile from "./component/ProfileComponent/DoctorProfile/DoctorProfile";
+import DoctorAppointments from "./component/ProfileComponent/DoctorProfile/DoctorAppointments";
+import DoctorPendingRequests from "./component/ProfileComponent/DoctorProfile/DoctorPendingRequests";
+import DoctorDash from "./component/ProfileComponent/DoctorProfile/DrDashboard";
+import DoctorDetails from "./component/FindDoctorPage/DoctorDetailsPage/DoctorDetails";
+
 function App() {
   return (
     <>
@@ -81,8 +85,40 @@ function App() {
             </RouteProtection>
           }
         >
-          <Route path="profile" element={<DoctorProfile />} />
+          <Route
+            path="profile"
+            element={
+              <RouteProtection>
+                <DoctorProfile />
+              </RouteProtection>
+            }
+          />
+          <Route
+            path="appointments"
+            element={
+              <RouteProtection>
+                <DoctorAppointments />
+              </RouteProtection>
+            }
+          />
+          <Route
+            path="pending-requests"
+            element={
+              <RouteProtection>
+                <DoctorPendingRequests />
+              </RouteProtection>
+            }
+          />
+          <Route
+            path="dashboard"
+            element={
+              <RouteProtection>
+                <DoctorDash />
+              </RouteProtection>
+            }
+          />
         </Route>
+        <Route path="DoctorDetails/:id" element={<DoctorDetails />} />
       </Routes>
     </>
   );
