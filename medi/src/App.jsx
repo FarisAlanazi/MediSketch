@@ -18,6 +18,7 @@ import DoctorAppointments from "./component/ProfileComponent/DoctorProfile/Docto
 import DoctorPendingRequests from "./component/ProfileComponent/DoctorProfile/DoctorPendingRequests";
 import DoctorDash from "./component/ProfileComponent/DoctorProfile/DrDashboard";
 import DoctorDetails from "./component/FindDoctorPage/DoctorDetailsPage/DoctorDetails";
+import DiscoverDoctorsMap from "./Pages/DiscoverDoctorsMap"; // Import the new map page so the old How it works slot can be replaced.
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
             </RouteProtection>
           }
         />
+        <Route path="/viewAll" element={<DiscoverDoctorsMap />} />{/* Reuse the current visible navbar path for the new Discover Doctors on Map page. */}
 
         <Route path="/entry" element={<AccountEntryContext />} />
         <Route

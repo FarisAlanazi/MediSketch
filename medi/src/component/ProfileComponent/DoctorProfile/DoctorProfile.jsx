@@ -1,238 +1,379 @@
-import React from "react";
-import api, { getCSRFToken } from "../../../Auth/LoginLogic";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { MdPriceChange } from "react-icons/md";
+import api, { getCSRFToken } from "../../../Auth/LoginLogic";
+import DoctorLocationPicker from "./DoctorLocationPicker";
+import "../Profile_Style/profilePages.css";
+
+const createEmptyDoctorForm = () => ({
+  userId: "",
+  first_name: "",
+  last_name: "",
+  email: "",
+  phone_number: "",
+  age: "",
+  gender: "",
+  price: "",
+  clinic_name: "",
+  years_of_experience: "",
+  about_me: "",
+  specialization: "",
+  medical_id: "",
+  latitude: "",
+  longitude: "",
+});
+
+const toNullableNumber = (value) => {
+  if (value === "" || value === null || value === undefined) {
+    return null;
+  }
+
+  const parsedValue = Number(value);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
+const toTextValue = (value) => String(value ?? "");
 
 function DoctorProfile() {
-  const [userInfo, setUserInfo] = useState({
-    username: "",
-    email: "",
-    first_name: "",
-    last_name: "",
-    phone_number: "",
-    age: "",
-    gender: "",
-    user_type: "",
-    about_me: "",
-    years_of_experience: "",
-    price: "",
-    address: "",
-    specialization: "",
-    id: "",
-  });
+  const [doctorForm, setDoctorForm] = useState(createEmptyDoctorForm());
+  const [specializations, setSpecializations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [medicalIdTouched, setMedicalIdTouched] = useState(false);
 
   const handleChange = (e) => {
-    setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setDoctorForm((currentForm) => ({ ...currentForm, [name]: value }));
+  };
+
+  const handleLocationChange = ({ latitude, longitude }) => {
+    setDoctorForm((currentForm) => ({
+      ...currentForm,
+      latitude,
+      longitude,
+    }));
   };
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await api.get(`me/`);
-        if (res.data) {
-          const profileData = {
-            first_name: res.data.first_name ?? "",
-            last_name: res.data.last_name ?? "",
-            email: res.data.email ?? "",
-            phone_number: res.data.phone_number ?? "",
-            gender: res.data.gender ?? "",
-            age: res.data.age ?? "",
-            user_type: res.data.user_type ?? "",
-            about_me: res.data.about_me ?? "",
-            years_of_experience: res.data.years_of_experience ?? "",
-            price: res.data.price ?? "",
-            address: res.data.address ?? "",
-            specialization: res.data.specialization ?? "",
-            id: res.data.id ?? "",
-          };
+    let isMounted = true;
 
-          setUserInfo(profileData);
-          console.log(profileData);
+    const loadDoctorProfile = async () => {
+      setIsLoading(true);
+      setLoadError("");
+
+      try {
+        const meResponse = await api.get("/me/");
+        const currentUser = meResponse.data;
+        const [doctorResponse, specializationsResponse] = await Promise.all([
+          api.get(`/doctors/${currentUser.id}/`),
+          api.get("/specializations/"),
+        ]);
+
+        if (!isMounted) {
+          return;
         }
-        console.log(res);
-      } catch (err) {
-        console.log(err);
+
+        const specializationOptions = Array.isArray(specializationsResponse.data)
+          ? specializationsResponse.data
+          : [];
+        const matchedSpecialization =
+          specializationOptions.find(
+            (specialization) =>
+              String(specialization.id) === String(currentUser.specialization) ||
+              specialization.name === doctorResponse.data.specialization,
+          ) ?? null;
+
+        setSpecializations(specializationOptions);
+        setDoctorForm({
+          userId: toTextValue(currentUser.id),
+          first_name: toTextValue(currentUser.first_name),
+          last_name: toTextValue(currentUser.last_name),
+          email: toTextValue(currentUser.email),
+          phone_number: toTextValue(currentUser.phone_number),
+          age: toTextValue(currentUser.age),
+          gender: toTextValue(currentUser.gender),
+          price: toTextValue(currentUser.price),
+          clinic_name: toTextValue(doctorResponse.data?.clinic_name),
+          years_of_experience: toTextValue(currentUser.years_of_experience),
+          about_me: toTextValue(currentUser.about_me),
+          specialization: matchedSpecialization
+            ? toTextValue(matchedSpecialization.id)
+            : "",
+          medical_id: toTextValue(doctorResponse.data?.Med_id),
+          latitude: toTextValue(doctorResponse.data?.latitude),
+          longitude: toTextValue(doctorResponse.data?.longitude),
+        });
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setLoadError("Unable to load the doctor profile right now.");
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    getData();
+    loadDoctorProfile();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleSubmission = async (e) => {
     e.preventDefault();
+
+    setMedicalIdTouched(true);
+
+    if (isMedicalIdInvalid) {
+      return;
+    }
+
+    setIsSaving(true);
     await getCSRFToken();
 
     try {
-      const patch = await api.patch(`me/`, userInfo);
-      console.log(patch);
+      await api.patch("/me/", {
+        first_name: doctorForm.first_name,
+        last_name: doctorForm.last_name,
+        email: doctorForm.email,
+        phone_number: doctorForm.phone_number,
+        age: toNullableNumber(doctorForm.age),
+        gender: doctorForm.gender || null,
+        price: toNullableNumber(doctorForm.price),
+        about_me: doctorForm.about_me,
+        years_of_experience: toNullableNumber(doctorForm.years_of_experience),
+        specialization: doctorForm.specialization || "empty",
+      });
+
+      await api.patch(`/doctors/${doctorForm.userId}/`, {
+        clinic_name: doctorForm.clinic_name,
+        Med_id: doctorForm.medical_id.trim(),
+        latitude: toNullableNumber(doctorForm.latitude),
+        longitude: toNullableNumber(doctorForm.longitude),
+      });
+
       toast.success("Profile edited successfully");
-    } catch (err) {
-      toast.error("something went wrong", err);
+    } catch {
+      toast.error("Something went wrong while saving the profile.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
+  const isMedicalIdInvalid = useMemo(() => {
+    const medicalId = doctorForm.medical_id.trim();
+    return !medicalId || !medicalId.startsWith("10001");
+  }, [doctorForm.medical_id]);
+
+  if (isLoading) {
+    return (
+      <section className="profile-page">
+        <div className="profile-card profile-loading-card">
+          Loading doctor profile...
+        </div>
+      </section>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <section className="profile-page">
+        <div className="profile-card profile-loading-card">{loadError}</div>
+      </section>
+    );
+  }
+
   return (
-    <div className="section-center">
-      <form className="form" onSubmit={handleSubmission}>
-        {/* <label htmlFor="username" className="form-label">
-          Username
-        </label>
-        <input
-          type="text"
-          name="username"
-          id="username"
-          className="form-input form-row"
-          value={userInfo.username}
-          onChange={handleChange}
-        /> */}
+    <section className="profile-page">
+      <header className="profile-page-header">
+        <p>Doctor Profile</p>
+        <h1>Edit your professional profile</h1>
+        <span>
+          Keep your personal details, clinic location, and professional
+          information up to date.
+        </span>
+      </header>
 
-        <label htmlFor="first_name" className="form-label">
-          First Name
-        </label>
-        <input
-          type="text"
-          name="first_name"
-          id="first_name"
-          className="form-input form-row"
-          value={userInfo.first_name}
-          onChange={handleChange}
-        />
-        <label htmlFor="last_name" className="form-label">
-          Last Name
-        </label>
-        <input
-          type="text"
-          name="last_name"
-          id="last_name"
-          className="form-input form-row"
-          value={userInfo.last_name}
-          onChange={handleChange}
-        />
-        <label htmlFor="email" className="form-label">
-          Email
-        </label>
-        <input
-          type="text"
-          name="email"
-          id="email"
-          className="form-input form-row"
-          value={userInfo.email}
-          onChange={handleChange}
-        />
-        <label htmlFor="phone_number" className="form-label">
-          Phone
-        </label>
-        <input
-          type="text"
-          name="phone_number"
-          id="phone_number"
-          className="form-input form-row"
-          value={userInfo.phone_number}
-          onChange={handleChange}
-        />
-        <label htmlFor="age" className="form-label">
-          Age
-        </label>
-        <input
-          type="text"
-          name="age"
-          id="age"
-          className="form-input form-row"
-          value={userInfo.age}
-          onChange={handleChange}
-        />
+      <form className="profile-card profile-form-layout" onSubmit={handleSubmission}>
+        <section>
+          <h2 className="profile-section-title">Basic Information</h2>
+          <div className="profile-form-grid">
+            <div className="profile-field">
+              <label htmlFor="first_name">First Name</label>
+              <input
+                type="text"
+                name="first_name"
+                id="first_name"
+                value={doctorForm.first_name}
+                onChange={handleChange}
+              />
+            </div>
 
-        <label htmlFor="price" className="form-label">
-          Price
-        </label>
-        <input
-          type="text"
-          name="price"
-          id="price"
-          className="form-input form-row"
-          value={userInfo.price}
-          onChange={handleChange}
-        />
-        <label htmlFor="address" className="form-label">
-          Address
-        </label>
-        <input
-          type="text"
-          name="address"
-          id="address"
-          className="form-input form-row"
-          value={userInfo.address}
-          onChange={handleChange}
-        />
+            <div className="profile-field">
+              <label htmlFor="last_name">Last Name</label>
+              <input
+                type="text"
+                name="last_name"
+                id="last_name"
+                value={doctorForm.last_name}
+                onChange={handleChange}
+              />
+            </div>
 
-        <label htmlFor="years" className="form-label">
-          {" "}
-          years of experience{" "}
-        </label>
-        <input
-          type="number"
-          value={userInfo.years_of_experience}
-          onChange={handleChange}
-          name="years_of_experience"
-          id="years"
-          className="form-input form-row"
-        />
-        <label htmlFor="about_me" className="form-label">
-          About Me
-        </label>
-        <textarea
-          name="about_me"
-          id="about_me"
-          className=" form-row form-textarea"
-          value={userInfo.about_me}
-          onChange={handleChange}
-        />
+            <div className="profile-field">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                value={doctorForm.email}
+                onChange={handleChange}
+              />
+            </div>
 
-        <label htmlFor="specialization" className="form-label">
-          Specialization
-        </label>
-        <select
-          name="specialization"
-          id="specialization"
-          value={userInfo.specialization}
-          onChange={handleChange}
-          className="form-input"
-          defaultValue={"empty"}
+            <div className="profile-field">
+              <label htmlFor="phone_number">Phone</label>
+              <input
+                type="text"
+                name="phone_number"
+                id="phone_number"
+                value={doctorForm.phone_number}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="age">Age</label>
+              <input
+                type="number"
+                name="age"
+                id="age"
+                value={doctorForm.age}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="gender">Gender</label>
+              <select
+                name="gender"
+                id="gender"
+                value={doctorForm.gender}
+                onChange={handleChange}
+              >
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="profile-section-title">Professional Details</h2>
+          <div className="profile-form-grid">
+            <div className="profile-field">
+              <label htmlFor="price">Consultation Price</label>
+              <input
+                type="number"
+                name="price"
+                id="price"
+                value={doctorForm.price}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="years_of_experience">Years of Experience</label>
+              <input
+                type="number"
+                name="years_of_experience"
+                id="years_of_experience"
+                value={doctorForm.years_of_experience}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="specialization">Specialization</label>
+              <select
+                name="specialization"
+                id="specialization"
+                value={doctorForm.specialization}
+                onChange={handleChange}
+              >
+                <option value="">Select specialization</option>
+                {specializations.map((specialization) => (
+                  <option key={specialization.id} value={specialization.id}>
+                    {specialization.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="medical_id">Medical ID</label>
+              <input
+                type="text"
+                name="medical_id"
+                id="medical_id"
+                value={doctorForm.medical_id}
+                onChange={handleChange}
+                onBlur={() => setMedicalIdTouched(true)}
+                className={medicalIdTouched && isMedicalIdInvalid ? "profile-input-invalid" : ""}
+              />
+              {medicalIdTouched && isMedicalIdInvalid ? (
+                <span className="profile-field-error">
+                  Medical ID must start with 10001.
+                </span>
+              ) : null}
+            </div>
+
+            <div className="profile-field-wide">
+              <label htmlFor="clinic_name">Address</label>
+              <input
+                type="text"
+                name="clinic_name"
+                id="clinic_name"
+                value={doctorForm.clinic_name}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="profile-field-wide">
+              <label htmlFor="about_me">About Me</label>
+              <textarea
+                name="about_me"
+                id="about_me"
+                value={doctorForm.about_me}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="profile-section-title">Clinic Location</h2>
+          <DoctorLocationPicker
+            latitude={doctorForm.latitude}
+            longitude={doctorForm.longitude}
+            onLocationChange={handleLocationChange}
+          />
+        </section>
+
+        <button
+          type="submit"
+          className="profile-save-button"
+          disabled={isSaving || isMedicalIdInvalid}
         >
-          <option value="empty"> SELECT YOUR SPECIALIZATION</option>
-          <option value="1">CARDIOLOGY</option>
-          <option value="2">NEUROLOGY</option>
-          <option value="3">PEDIATRICS</option>
-          <option value="4">DERMATOLOGY</option>
-          <option value="5">PSYCHIATRY</option>
-          <option value="6">ORTHOPEDICS</option>
-          <option value="7">GYNECOLOGY</option>
-          <option value="8">GENERAL PRACTICE</option>
-          <option value="9">OTHER</option>
-        </select>
-
-        <label htmlFor="gender" className="form-label">
-          Gender
-        </label>
-        <select
-          name="gender"
-          id="gender"
-          value={userInfo.gender}
-          onChange={handleChange}
-          className="form-input"
-          defaultValue={"empty"}
-        >
-          <option value="empty"> SELECT YOUR GENDER</option>
-          <option value="male">MALE</option>
-          <option value="female">FEMALE</option>
-        </select>
-
-        <button className="btn btn-block" style={{ marginTop: "35px" }}>
-          Edit
+          {isSaving ? "Saving..." : "Save Profile"}
         </button>
       </form>
-    </div>
+    </section>
   );
 }
 

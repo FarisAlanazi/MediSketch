@@ -1,9 +1,22 @@
 import "./FooterAndNavStyles/footerStyle.css";
+import img from "../../assets/imgs/globalIcon.png";
 
 const Footer = () => {
   return (
-    <div className="footer-container">
+    <footer className="footer-container">
       <div className="footer-info">
+        <article className="footer-brand">
+          <div className="footer-brand-top">
+            <span className="footer-logo-shell">
+              <img src={img} alt="" className="footer-logo" />
+            </span>
+            <h1>MediSketch</h1>
+          </div>
+          <p>
+            Find trusted specialists and book medical care with a calmer,
+            cleaner experience.
+          </p>
+        </article>
         <article>
           <h1>About</h1>
           <a href="">Lorem ipsum dolor sit amet, .</a>
@@ -20,7 +33,10 @@ const Footer = () => {
           <a href="">Twitter</a>
         </article>
       </div>
-    </div>
+      <div className="footer-bottom">
+        <p>Copyright © 2026 MediConnect. All rights reserved.</p>
+      </div>
+    </footer>
   );
 };
 

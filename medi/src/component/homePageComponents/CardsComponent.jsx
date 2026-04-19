@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // import img from "../../assets/imgs/doctor-with-his-arms-crossed-white-background.jpg";
 import "../../SearchAndCardStyle/cardsStyle.css";
 import Cards from "./Cards";
@@ -38,6 +38,7 @@ const CardsComponent = () => {
             last_name={cardInfo.user.last_name}
             age={cardInfo.user.age}
             clinic={cardInfo.clinic}
+            gender={cardInfo.user.gender}
             price={cardInfo.price}
             experience={cardInfo.years_of_experience}
             specialization={cardInfo.specialization}

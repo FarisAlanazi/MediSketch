@@ -82,15 +82,15 @@ function AuthProvider({ children }) {
 
   return (
     <authContext.Provider
-      value={{
-        user,
-        setUser,
-        login,
-        logout,
-        isAuthenticated,
-        // loading,
-      }}
-    >
+        value={{
+          user,
+          setUser,
+          login,
+          logout,
+          isAuthenticated,
+          loading,
+        }}
+      >
       {children}
     </authContext.Provider>
   );

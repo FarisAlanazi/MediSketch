@@ -1,30 +1,76 @@
-import React from "react";
+import "./detailsStyles/styles.css";
 
-function LocationCard() {
+const TABUK_CENTER = {
+  latitude: 28.3838,
+  longitude: 36.5662,
+};
+
+const parseCoordinate = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const parsedValue = Number.parseFloat(String(value).replace(/[^\d.-]/g, ""));
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
+const buildMapEmbedSrc = (latitude, longitude) => {
+  const longitudeOffset = 0.2;
+  const latitudeOffset = 0.12;
+  const bbox = [
+    TABUK_CENTER.longitude - longitudeOffset,
+    TABUK_CENTER.latitude - latitudeOffset,
+    TABUK_CENTER.longitude + longitudeOffset,
+    TABUK_CENTER.latitude + latitudeOffset,
+  ]
+    .map((value) => value.toFixed(6))
+    .join("%2C");
+
+  const marker =
+    latitude !== null && longitude !== null
+      ? `&marker=${latitude.toFixed(6)}%2C${longitude.toFixed(6)}`
+      : "";
+
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik${marker}`;
+};
+
+function LocationCard({ doctorName, locationLabel, latitude, longitude }) {
+  const parsedLatitude = parseCoordinate(latitude);
+  const parsedLongitude = parseCoordinate(longitude);
+  const hasExactLocation =
+    parsedLatitude !== null &&
+    parsedLongitude !== null &&
+    Math.abs(parsedLatitude) <= 90 &&
+    Math.abs(parsedLongitude) <= 180;
+
   return (
-    <div className="form">
-      <div
-        className="card"
-        style={{
-          width: "15rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "1rem",
-        }}
-      >
-        <img
-          className="card-img-top imgWithNoMargin"
-          src="data:image/png;base64,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"
-          alt="Card image cap"
-        />
-        <div className="card-body">
-          <a href="#" className="btn btn-primary">
-            Go somewhere
-          </a>
+    <section className="details-card map-card">
+      <div className="details-section-heading">
+        <div>
+          <p className="details-card-label">Location</p>
+          <h2>Doctor Location</h2>
         </div>
+        <p className="map-location-text">{locationLabel}</p>
       </div>
-    </div>
+
+      <div className="map-frame-shell">
+        <iframe
+          title={`Map for ${doctorName}`}
+          src={buildMapEmbedSrc(
+            hasExactLocation ? parsedLatitude : null,
+            hasExactLocation ? parsedLongitude : null,
+          )}
+          className="doctor-map-frame"
+          loading="lazy"
+        />
+      </div>
+
+      <p className="map-note">
+        {hasExactLocation
+          ? "The map stays centered on Tabuk and marks the doctor's recorded coordinates."
+          : "Exact doctor location unavailable. The map remains centered on Tabuk, Saudi Arabia."}
+      </p>
+    </section>
   );
 }
 

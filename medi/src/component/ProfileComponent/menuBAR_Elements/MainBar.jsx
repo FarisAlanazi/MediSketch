@@ -7,34 +7,39 @@ import { FaUserAlt } from "react-icons/fa";
 
 function MainBar() {
   return (
-    <div className="section-center">
-      <section className="section">
-        <ul>
-          <Link to="/account/profile">
-            <li className="profileLI">
-              Profile
-              <span>
-                <FaUserAlt size={20} />
-              </span>
-            </li>
-          </Link>
-          <Link to={"/account/MyAppointments"}>
-            <li className="profileLI">
-              Appointments{" "}
-              <span>
-                {" "}
-                <MdEventAvailable size={20} />
-              </span>
-            </li>
-          </Link>
-          <Link to="/account/Pending">
-            <li className="profileLI">
-              Pending{" "}
-              <span>
-                <CiClock2 size={20} />
-              </span>
-            </li>
-          </Link>
+    <div className="center-div">
+      <section className="profile-tabs-shell">
+        <ul className="profile-tabs">
+          <li className="profile-tab-link">
+            <Link to="/account/profile">
+              <div className="profileLI">
+                Profile
+                <span>
+                  <FaUserAlt size={20} />
+                </span>
+              </div>
+            </Link>
+          </li>
+          <li className="profile-tab-link">
+            <Link to="/account/MyAppointments">
+              <div className="profileLI">
+                Appointments
+                <span>
+                  <MdEventAvailable size={20} />
+                </span>
+              </div>
+            </Link>
+          </li>
+          <li className="profile-tab-link">
+            <Link to="/account/Pending">
+              <div className="profileLI">
+                Pending
+                <span>
+                  <CiClock2 size={20} />
+                </span>
+              </div>
+            </Link>
+          </li>
         </ul>
       </section>
 

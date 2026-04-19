@@ -1,49 +1,74 @@
 /* btn 1 style*/
 
 .buttons {
-  width: 120px;
-  height: 50px;
-  border: 3px solid #4f6cd4;
-  border-radius: 45px;
-  transition: all 0.3s;
+  min-width: 7rem;
+  height: 2.9rem;
+  padding: 0 1.4rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  background: white;
-  font-size: 1.2em;
-  font-weight: 550;
-  margin-right: 30px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.buttons-primary {
+  background: linear-gradient(135deg, var(--primaryAccent), #3b82f6);
+  color: #ffffff;
+  box-shadow: 0 16px 30px rgba(37, 99, 235, 0.22);
+}
+
+.buttons-secondary {
+  background: var(--surfaceColor);
+  border-color: var(--borderColor);
+  color: var(--textColor);
 }
 
 .buttons:hover {
-  background: #6175be;
-  color: white;
-  font-size: 1em;
+  transform: translateY(-1px);
+}
+
+.buttons-primary:hover {
+  box-shadow: 0 20px 34px rgba(37, 99, 235, 0.28);
+}
+
+.buttons-secondary:hover {
+  background: var(--surfaceSubtle);
+  border-color: var(--borderStrong);
+  color: var(--textColor);
 }
 
 .buttonForBook {
-  padding: 1.7em 3em;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 2.5px;
-  font-weight: 500;
-  color: #000;
-  background-color: #fff;
+  margin-top: auto;
+  padding: 0.9rem 1.4rem;
+  font-size: 0.86rem;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--primaryAccent), var(--primaryAccentSoft));
   border: none;
-  border-radius: 45px;
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease 0s;
+  border-radius: 999px;
+  box-shadow: 0 16px 28px rgba(37, 99, 235, 0.2);
   cursor: pointer;
   outline: none;
 }
 
 .buttonForBook:hover {
-  background-color: #23c483;
-  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
-  color: #fff;
-  transform: translateY(-7px);
+  box-shadow: 0 22px 36px rgba(37, 99, 235, 0.28);
+  transform: translateY(-2px);
 }
 
 .buttonForBook:active {
-  transform: translateY(-1px);
+  transform: translateY(0);
 }
 
 /*above made by Hamzah*/

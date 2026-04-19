@@ -1,4 +1,3 @@
-import React from "react";
 import { useState } from "react";
 import "../../SearchAndCardStyle/searchComponentStyle.css";
 import doctorImg from "../../assets/imgs/DoctorOnPhone.png";
@@ -16,14 +15,28 @@ function SearchComponent() {
           nisi, nostrum ducimus aliquid, atque assumenda exercitationem nihil
           tenetur. Expedita.
         </p>
-        <input
-          type="search"
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
+        <div className="searchShell">
+          <input
+            type="search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            placeholder="Search doctors, specialties, clinics"
+            aria-label="Search doctors"
+          />
+          <span className="searchShellButton" aria-hidden="true">
+            Search
+          </span>
+        </div>
+        <p className="searchHelperNote">
+          Search by specialty, clinic, or doctor name to get started.
+        </p>
       </div>
       <div className="imgClass">
-        <img src={doctorImg} alt="" className="doctorImg" />
+        <img
+          src={doctorImg}
+          alt="Doctor consulting by phone"
+          className="doctorImg"
+        />
       </div>
     </div>
   );

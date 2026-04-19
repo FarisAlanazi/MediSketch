@@ -9,42 +9,48 @@ import { RxDashboard } from "react-icons/rx";
 function DoctorMainBar() {
   return (
     <div className="center-div">
-      <section className="section">
-        <ul>
-          <Link to="/doctor/profile">
-            <li className="profileLI">
-              Doctor Info
-              <span>
-                <FaUserAlt size={20} />
-              </span>
-            </li>
-          </Link>
-          <Link to={"/doctor/appointments"}>
-            <li className="profileLI">
-              Today's Schedule{" "}
-              <span>
-                {" "}
-                <MdEventAvailable size={20} />
-              </span>
-            </li>
-          </Link>
-          <Link to="/doctor/pending-requests">
-            <li className="profileLI">
-              Requests{" "}
-              <span>
-                <CiClock2 size={20} />
-              </span>
-            </li>
-          </Link>
-
-          <Link to="/doctor/dashboard">
-            <li className="profileLI">
-              Dashboard{" "}
-              <span>
-                <RxDashboard size={20} />
-              </span>
-            </li>
-          </Link>
+      <section className="profile-tabs-shell">
+        <ul className="profile-tabs">
+          <li className="profile-tab-link">
+            <Link to="/doctor/profile">
+              <div className="profileLI">
+                Doctor Profile
+                <span>
+                  <FaUserAlt size={20} />
+                </span>
+              </div>
+            </Link>
+          </li>
+          <li className="profile-tab-link">
+            <Link to="/doctor/appointments">
+              <div className="profileLI">
+                Appointments
+                <span>
+                  <MdEventAvailable size={20} />
+                </span>
+              </div>
+            </Link>
+          </li>
+          <li className="profile-tab-link">
+            <Link to="/doctor/pending-requests">
+              <div className="profileLI">
+                Requests
+                <span>
+                  <CiClock2 size={20} />
+                </span>
+              </div>
+            </Link>
+          </li>
+          <li className="profile-tab-link">
+            <Link to="/doctor/dashboard">
+              <div className="profileLI">
+                Dashboard
+                <span>
+                  <RxDashboard size={20} />
+                </span>
+              </div>
+            </Link>
+          </li>
         </ul>
       </section>
 

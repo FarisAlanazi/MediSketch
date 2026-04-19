@@ -1,90 +1,198 @@
+.specialists-section {
+  width: min(1240px, calc(100% - 48px));
+  margin: 0 auto;
+  padding-bottom: 5.5rem;
+}
+
 .FeaturedSpecialists {
+  min-height: auto;
+  padding-bottom: 2rem;
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  height: 200px;
+  gap: 1.5rem;
 }
 
 .cardArtical {
-  font-size: 1.75rem;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  margin-left: 55px;
+  margin-left: 0;
+  font-family: inherit;
+}
+
+.cardArtical > h1 {
+  margin-bottom: 0.75rem;
+  color: #10213f;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  text-transform: none;
 }
 
 .cardArtical > p {
-  color: grey;
+  color: #6c7f97;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
-.FeaturedSpecialists > a {
-  font-size: 1.4rem;
-  text-decoration: none;
-  font-weight: 600;
+.FeaturedSpecialists h4 {
+  font-size: 1rem;
+  font-weight: 700;
 }
 
-.card-container {
-  margin-top: 50px;
-  display: grid;
-  grid-template-columns: 570px 570px 570px;
-  grid-template-rows: 270px 270px 270px;
-
-  gap: 17px;
+.FeaturedSpecialists h4 a {
+  color: #2563eb;
 }
 
-.card {
-  background-color: #e8e2d8;
-  width: 570px;
-  height: 270px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 4%;
-}
-
-.card > img {
-  width: 160px;
-  height: 130px;
-  position: relative;
-  top: 0;
-  left: 0;
-  margin-left: 50;
+.FeaturedSpecialists h4 a:hover,
+.FeaturedSpecialists h4 a:focus-visible {
+  color: #1d4ed8;
 }
 
 .cardsDiv {
-  display: flex;
-  justify-content: center;
+  display: block;
 }
 
-@media screen and (max-width: 1300px) {
+.card-container {
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.home-doctor-card {
+  min-height: 100%;
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: #ffffff;
+  border: 1px solid #e2ecf7;
+  border-radius: 1.75rem;
+  box-shadow: 0 18px 34px rgba(16, 33, 63, 0.06);
+}
+
+.card-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.card-specialty,
+.card-price {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.card-specialty {
+  background: #eff5ff;
+  color: #2563eb;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card-price {
+  margin-left: auto;
+  background: #e9f8ef;
+  color: #1c8b4f;
+}
+
+.card-body-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+}
+
+.doctor-card-image {
+  width: 7.35rem;
+  height: 8.5rem;
+  margin: 0;
+  border-radius: 1.4rem;
+  background: #edf3fb;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.doctor-card-content {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.doctor-card-content h4 {
+  color: #10213f;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  text-transform: none;
+}
+
+.card-location {
+  color: #72839a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.doctor-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.doctor-card-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.1rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: #f3f7fc;
+  color: #637691;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+@media (max-width: 1180px) {
   .card-container {
-    display: grid;
-    grid-template-columns: 470px 470px;
-    grid-template-rows: 270px 270px 270px;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 170px;
-  }
-  .card {
-    width: 90%;
-    height: auto;
-    flex-direction: column;
-    padding: 20px;
-  }
-  .card > img {
-    width: 100%;
-    height: auto;
-    margin: 0;
-  }
-  .cardArtical {
-    text-align: center;
-    margin: 20px 0;
-  }
-  .FeaturedSpecialists {
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-  .FeaturedSpecialists > a {
-    font-size: 1.2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-/*All above written by Hamzah*/
+
+@media (max-width: 760px) {
+  .specialists-section {
+    width: min(1240px, calc(100% - 24px));
+    padding-bottom: 4rem;
+  }
+
+  .FeaturedSpecialists {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .card-container {
+    grid-template-columns: 1fr;
+  }
+
+  .home-doctor-card {
+    padding: 1.2rem;
+  }
+
+  .card-body-layout {
+    flex-direction: column;
+  }
+
+  .doctor-card-image {
+    width: 100%;
+    height: 15rem;
+  }
+}
