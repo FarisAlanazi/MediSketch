@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import api, { getCSRFToken } from "../../../Auth/LoginLogic";
+import { useTranslation } from "react-i18next";
 import "../Profile_Style/profilePages.css";
 
-const getPatientName = (appointment) => {
+const getPatientName = (appointment, t) => {
   const fullName =
     `${appointment?.patient?.user?.first_name ?? ""} ${
       appointment?.patient?.user?.last_name ?? ""
     }`.trim();
 
-  return fullName || appointment?.patient?.user?.username || "Patient";
+  return fullName || appointment?.patient?.user?.username || t("records.patientFallback");
 };
 
 const normalizeStatus = (status) => String(status ?? "").trim().toLowerCase();
 
 function DoctorAppointments() {
+  const { t } = useTranslation();
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -37,7 +39,7 @@ function DoctorAppointments() {
         setAppointments(Array.isArray(response.data) ? response.data : []);
       } catch {
         if (isMounted) {
-          setLoadError("Unable to load appointments right now.");
+          setLoadError(t("records.appointmentsError"));
         }
       } finally {
         if (isMounted) {
@@ -51,7 +53,7 @@ function DoctorAppointments() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   const handleApprove = async (appointmentId) => {
     setApprovingId(appointmentId);
@@ -71,7 +73,7 @@ function DoctorAppointments() {
         ),
       );
     } catch {
-      setActionError("Unable to approve this appointment right now.");
+      setActionError(t("records.approveError"));
     } finally {
       setApprovingId(null);
     }
@@ -80,14 +82,14 @@ function DoctorAppointments() {
   return (
     <section className="profile-record-page">
       <header className="record-page-header">
-        <p>Appointments</p>
-        <h1>Doctor appointments</h1>
-        <span>See the bookings linked to your account in one simple list.</span>
+        <p>{t("records.appointmentsLabel")}</p>
+        <h1>{t("records.doctorAppointmentsTitle")}</h1>
+        <span>{t("records.doctorAppointmentsSubtitle")}</span>
       </header>
 
       <div className="record-card">
         {isLoading ? (
-          <div className="record-empty-state">Loading appointments...</div>
+          <div className="record-empty-state">{t("records.loadingAppointments")}</div>
         ) : loadError ? (
           <div className="record-empty-state">{loadError}</div>
         ) : appointments.length ? (
@@ -101,26 +103,31 @@ function DoctorAppointments() {
                 <article key={appointment.id} className="record-item">
                   <div className="record-item-header">
                     <div>
-                      <h2>{getPatientName(appointment)}</h2>
-                      <p className="record-item-meta">
-                        {appointment?.patient?.user?.phone_number ||
+                      <h2>{getPatientName(appointment, t)}</h2>
+                    <p className="record-item-meta">
+                      {appointment?.patient?.user?.phone_number ||
                           appointment?.patient?.user?.email ||
-                          "Patient account"}
+                          t("records.patientAccount")}
                       </p>
                     </div>
 
                     <span
                       className={`record-status-pill record-status-${normalizeStatus(appointment.status)}`}
                     >
-                      {appointment.status}
+                      {t(`status.${normalizeStatus(appointment.status)}`, {
+                        defaultValue: appointment.status,
+                      })}
                     </span>
                   </div>
 
                   <p className="record-item-meta">
-                    Date: {appointment.date} | Time: {appointment.time}
+                    {t("records.dateTime", {
+                      date: appointment.date,
+                      time: appointment.time,
+                    })}
                   </p>
                   <p className="record-item-note">
-                    This appointment came from a real booking request.
+                    {t("records.realBookingRequest")}
                   </p>
 
                   {normalizeStatus(appointment.status) === "pending" ? (
@@ -131,7 +138,9 @@ function DoctorAppointments() {
                         onClick={() => handleApprove(appointment.id)}
                         disabled={approvingId === appointment.id}
                       >
-                        {approvingId === appointment.id ? "Approving..." : "Approve"}
+                        {approvingId === appointment.id
+                          ? t("records.approving")
+                          : t("records.approve")}
                       </button>
                     </div>
                   ) : null}
@@ -141,7 +150,7 @@ function DoctorAppointments() {
           </>
         ) : (
           <div className="record-empty-state">
-            No appointments have been booked yet.
+            {t("records.noDoctorAppointments")}
           </div>
         )}
       </div>

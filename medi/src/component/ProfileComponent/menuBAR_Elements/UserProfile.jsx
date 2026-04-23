@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api, { getCSRFToken } from "../../../Auth/LoginLogic";
+import { useTranslation } from "react-i18next";
 import "../Profile_Style/profilePages.css";
 
 const createEmptyPatientForm = () => ({
@@ -13,6 +14,7 @@ const createEmptyPatientForm = () => ({
 });
 
 function UserProfile() {
+  const { t } = useTranslation();
   const [userInfo, setUserInfo] = useState(createEmptyPatientForm());
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -46,7 +48,7 @@ function UserProfile() {
         }
       } catch {
         if (isMounted) {
-          setLoadError("Unable to load the patient profile right now.");
+          setLoadError(t("patientProfile.loadError"));
         }
       } finally {
         if (isMounted) {
@@ -60,7 +62,7 @@ function UserProfile() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   const handleSubmission = async (e) => {
     e.preventDefault();
@@ -69,9 +71,9 @@ function UserProfile() {
 
     try {
       await api.patch("/me/", userInfo);
-      toast.success("Profile edited successfully");
+      toast.success(t("patientProfile.success"));
     } catch {
-      toast.error("Something went wrong while saving the profile.");
+      toast.error(t("patientProfile.saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -81,7 +83,7 @@ function UserProfile() {
     return (
       <section className="profile-page">
         <div className="profile-card profile-loading-card">
-          Loading patient profile...
+          {t("patientProfile.loading")}
         </div>
       </section>
     );
@@ -98,20 +100,17 @@ function UserProfile() {
   return (
     <section className="profile-page">
       <header className="profile-page-header">
-        <p>Patient Profile</p>
-        <h1>Keep your account details clear and up to date</h1>
-        <span>
-          This page keeps your personal information simple, readable, and easy
-          to update.
-        </span>
+        <p>{t("patientProfile.pageLabel")}</p>
+        <h1>{t("patientProfile.pageTitle")}</h1>
+        <span>{t("patientProfile.pageSubtitle")}</span>
       </header>
 
       <form className="profile-card profile-form-layout" onSubmit={handleSubmission}>
         <section>
-          <h2 className="profile-section-title">Personal Information</h2>
+          <h2 className="profile-section-title">{t("patientProfile.sectionTitle")}</h2>
           <div className="profile-form-grid">
             <div className="profile-field">
-              <label htmlFor="first_name">First Name</label>
+              <label htmlFor="first_name">{t("patientProfile.firstName")}</label>
               <input
                 type="text"
                 name="first_name"
@@ -122,7 +121,7 @@ function UserProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="last_name">Last Name</label>
+              <label htmlFor="last_name">{t("patientProfile.lastName")}</label>
               <input
                 type="text"
                 name="last_name"
@@ -133,7 +132,7 @@ function UserProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">{t("patientProfile.email")}</label>
               <input
                 type="email"
                 name="email"
@@ -144,7 +143,7 @@ function UserProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="phone_number">Phone</label>
+              <label htmlFor="phone_number">{t("patientProfile.phone")}</label>
               <input
                 type="text"
                 name="phone_number"
@@ -155,7 +154,7 @@ function UserProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="age">Age</label>
+              <label htmlFor="age">{t("patientProfile.age")}</label>
               <input
                 type="number"
                 name="age"
@@ -166,23 +165,23 @@ function UserProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="gender">Gender</label>
+              <label htmlFor="gender">{t("patientProfile.gender")}</label>
               <select
                 name="gender"
                 id="gender"
                 value={userInfo.gender}
                 onChange={handleChange}
               >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+                <option value="">{t("patientProfile.selectGender")}</option>
+                <option value="male">{t("patientProfile.male")}</option>
+                <option value="female">{t("patientProfile.female")}</option>
               </select>
             </div>
           </div>
         </section>
 
         <button type="submit" className="profile-save-button" disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save Profile"}
+          {isSaving ? t("patientProfile.saving") : t("patientProfile.save")}
         </button>
       </form>
     </section>

@@ -2,7 +2,9 @@ import { useState } from "react";
 import "../../GeneralStyles/GeneralStyles.css";
 import { Link } from "react-router-dom";
 import Registration from "../../Auth/RegistrationLogic";
+import { useTranslation } from "react-i18next";
 function RegisterAsADoctor() {
+  const { t } = useTranslation();
   const [user, setUser] = useState({
     first_name: "",
     last_name: "",
@@ -28,37 +30,35 @@ function RegisterAsADoctor() {
 
   return (
     <section className="section-center">
-      <h1 className="title">
-        <span>Doctor</span> Registration
-      </h1>
+      <h1 className="title">{t("auth.doctorRegistration")}</h1>
       <form onSubmit={handleSubmit} className="form">
         <label htmlFor="Fname" className="form-label">
-          First Name
+          {t("auth.firstName")}
         </label>
         <input
           id="Fname"
           name="first_name"
           className="form-input form-row"
           type="text"
-          placeholder="First Name"
+          placeholder={t("auth.firstName")}
           value={user.first_name}
           onChange={handleChange}
         />
         <label htmlFor="Lname" className="form-label">
-          Last Name
+          {t("auth.lastName")}
         </label>
         <input
           id="Lname"
           name="last_name"
           className="form-input form-row"
           type="text"
-          placeholder="Last Name"
+          placeholder={t("auth.lastName")}
           value={user.last_name}
           onChange={handleChange}
         />
 
         <label htmlFor="phone" className="form-label">
-          Phone Number
+          {t("auth.phone")}
         </label>
         <input
           id="phone"
@@ -70,7 +70,7 @@ function RegisterAsADoctor() {
           onChange={handleChange}
         />
         <label htmlFor="email" className="form-label">
-          email
+          {t("auth.email")}
         </label>
         <input
           id="email"
@@ -82,7 +82,7 @@ function RegisterAsADoctor() {
           onChange={handleChange}
         />
         <label htmlFor="username" className="form-label">
-          Username
+          {t("auth.username")}
         </label>
         <input
           id="username"
@@ -94,26 +94,24 @@ function RegisterAsADoctor() {
           onChange={handleChange}
         />
         <label htmlFor="password" className="form-label">
-          {" "}
-          Password
+          {t("auth.password")}
         </label>
         <input
           className="form-input form-row"
           type="password"
           name="password"
-          placeholder="Password"
+          placeholder={t("auth.password")}
           value={user.password}
           onChange={handleChange}
         />
 
         <button type="submit" className="btn btn-block">
-          Register
+          {t("auth.register")}
         </button>
 
         <Link to="/register">
           <button className="btnRegisterAsDoctor btn-block">
-            {" "}
-            Register as a Patient
+            {t("auth.registerAsPatient")}
           </button>
         </Link>
       </form>

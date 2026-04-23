@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import api, { getCSRFToken } from "../../../Auth/LoginLogic";
+import saudiCities from "../../../constants/saudiCities";
 import DoctorLocationPicker from "./DoctorLocationPicker";
+import { useTranslation } from "react-i18next";
 import "../Profile_Style/profilePages.css";
 
 const createEmptyDoctorForm = () => ({
@@ -13,6 +15,7 @@ const createEmptyDoctorForm = () => ({
   age: "",
   gender: "",
   price: "",
+  city: "",
   clinic_name: "",
   years_of_experience: "",
   about_me: "",
@@ -33,7 +36,23 @@ const toNullableNumber = (value) => {
 
 const toTextValue = (value) => String(value ?? "");
 
+const pickTextValue = (primaryValue, fallbackValue) =>
+  toTextValue(primaryValue ?? fallbackValue);
+
+const getErrorMessage = (error, fallbackMessage) => {
+  if (typeof error?.response?.data?.detail === "string") {
+    return error.response.data.detail;
+  }
+
+  if (typeof error?.response?.data === "string") {
+    return error.response.data;
+  }
+
+  return fallbackMessage;
+};
+
 function DoctorProfile() {
+  const { t } = useTranslation();
   const [doctorForm, setDoctorForm] = useState(createEmptyDoctorForm());
   const [specializations, setSpecializations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,7 +83,7 @@ function DoctorProfile() {
       try {
         const meResponse = await api.get("/me/");
         const currentUser = meResponse.data;
-        const [doctorResponse, specializationsResponse] = await Promise.all([
+        const [doctorResult, specializationsResult] = await Promise.allSettled([
           api.get(`/doctors/${currentUser.id}/`),
           api.get("/specializations/"),
         ]);
@@ -73,42 +92,69 @@ function DoctorProfile() {
           return;
         }
 
-        const specializationOptions = Array.isArray(specializationsResponse.data)
-          ? specializationsResponse.data
-          : [];
+        if (doctorResult.status !== "fulfilled") {
+          throw doctorResult.reason;
+        }
+
+        const doctorResponse = doctorResult.value.data ?? {};
+        const specializationOptions =
+          specializationsResult.status === "fulfilled" &&
+          Array.isArray(specializationsResult.value.data)
+            ? specializationsResult.value.data
+            : [];
+        const visibleSpecializations =
+          specializationOptions.length ||
+          !currentUser.specialization ||
+          !doctorResponse.specialization
+            ? specializationOptions
+            : [
+                {
+                  id: currentUser.specialization,
+                  name: doctorResponse.specialization,
+                },
+              ];
         const matchedSpecialization =
-          specializationOptions.find(
+          visibleSpecializations.find(
             (specialization) =>
               String(specialization.id) === String(currentUser.specialization) ||
-              specialization.name === doctorResponse.data.specialization,
+              specialization.name === doctorResponse.specialization,
           ) ?? null;
 
-        setSpecializations(specializationOptions);
+        setSpecializations(visibleSpecializations);
         setDoctorForm({
           userId: toTextValue(currentUser.id),
           first_name: toTextValue(currentUser.first_name),
           last_name: toTextValue(currentUser.last_name),
           email: toTextValue(currentUser.email),
           phone_number: toTextValue(currentUser.phone_number),
-          age: toTextValue(currentUser.age),
-          gender: toTextValue(currentUser.gender),
-          price: toTextValue(currentUser.price),
-          clinic_name: toTextValue(doctorResponse.data?.clinic_name),
-          years_of_experience: toTextValue(currentUser.years_of_experience),
-          about_me: toTextValue(currentUser.about_me),
+          age: pickTextValue(doctorResponse.age, currentUser.age),
+          gender: pickTextValue(doctorResponse.gender, currentUser.gender),
+          price: pickTextValue(doctorResponse.price, currentUser.price),
+          city: toTextValue(doctorResponse.city),
+          clinic_name: toTextValue(doctorResponse.clinic_name),
+          years_of_experience: pickTextValue(
+            doctorResponse.years_of_experience,
+            currentUser.years_of_experience,
+          ),
+          about_me: pickTextValue(doctorResponse.about_me, currentUser.about_me),
           specialization: matchedSpecialization
             ? toTextValue(matchedSpecialization.id)
-            : "",
-          medical_id: toTextValue(doctorResponse.data?.Med_id),
-          latitude: toTextValue(doctorResponse.data?.latitude),
-          longitude: toTextValue(doctorResponse.data?.longitude),
+            : toTextValue(currentUser.specialization),
+          medical_id: toTextValue(doctorResponse.Med_id),
+          latitude: toTextValue(doctorResponse.latitude),
+          longitude: toTextValue(doctorResponse.longitude),
         });
-      } catch {
+      } catch (error) {
         if (!isMounted) {
           return;
         }
 
-        setLoadError("Unable to load the doctor profile right now.");
+        setLoadError(
+          getErrorMessage(
+            error,
+            t("doctorProfile.loadError"),
+          ),
+        );
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -121,7 +167,7 @@ function DoctorProfile() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   const handleSubmission = async (e) => {
     e.preventDefault();
@@ -150,15 +196,18 @@ function DoctorProfile() {
       });
 
       await api.patch(`/doctors/${doctorForm.userId}/`, {
+        city: doctorForm.city.trim(),
         clinic_name: doctorForm.clinic_name,
         Med_id: doctorForm.medical_id.trim(),
         latitude: toNullableNumber(doctorForm.latitude),
         longitude: toNullableNumber(doctorForm.longitude),
       });
 
-      toast.success("Profile edited successfully");
-    } catch {
-      toast.error("Something went wrong while saving the profile.");
+      toast.success(t("doctorProfile.success"));
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, t("doctorProfile.saveError")),
+      );
     } finally {
       setIsSaving(false);
     }
@@ -173,7 +222,7 @@ function DoctorProfile() {
     return (
       <section className="profile-page">
         <div className="profile-card profile-loading-card">
-          Loading doctor profile...
+          {t("doctorProfile.loading")}
         </div>
       </section>
     );
@@ -190,20 +239,17 @@ function DoctorProfile() {
   return (
     <section className="profile-page">
       <header className="profile-page-header">
-        <p>Doctor Profile</p>
-        <h1>Edit your professional profile</h1>
-        <span>
-          Keep your personal details, clinic location, and professional
-          information up to date.
-        </span>
+        <p>{t("doctorProfile.pageLabel")}</p>
+        <h1>{t("doctorProfile.pageTitle")}</h1>
+        <span>{t("doctorProfile.pageSubtitle")}</span>
       </header>
 
       <form className="profile-card profile-form-layout" onSubmit={handleSubmission}>
         <section>
-          <h2 className="profile-section-title">Basic Information</h2>
+          <h2 className="profile-section-title">{t("doctorProfile.basicInfo")}</h2>
           <div className="profile-form-grid">
             <div className="profile-field">
-              <label htmlFor="first_name">First Name</label>
+              <label htmlFor="first_name">{t("doctorProfile.firstName")}</label>
               <input
                 type="text"
                 name="first_name"
@@ -214,7 +260,7 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="last_name">Last Name</label>
+              <label htmlFor="last_name">{t("doctorProfile.lastName")}</label>
               <input
                 type="text"
                 name="last_name"
@@ -225,7 +271,7 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">{t("doctorProfile.email")}</label>
               <input
                 type="email"
                 name="email"
@@ -236,7 +282,7 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="phone_number">Phone</label>
+              <label htmlFor="phone_number">{t("doctorProfile.phone")}</label>
               <input
                 type="text"
                 name="phone_number"
@@ -247,7 +293,7 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="age">Age</label>
+              <label htmlFor="age">{t("doctorProfile.age")}</label>
               <input
                 type="number"
                 name="age"
@@ -258,26 +304,28 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="gender">Gender</label>
+              <label htmlFor="gender">{t("doctorProfile.gender")}</label>
               <select
                 name="gender"
                 id="gender"
                 value={doctorForm.gender}
                 onChange={handleChange}
               >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+                <option value="">{t("doctorProfile.selectGender")}</option>
+                <option value="male">{t("doctorProfile.male")}</option>
+                <option value="female">{t("doctorProfile.female")}</option>
               </select>
             </div>
           </div>
         </section>
 
         <section>
-          <h2 className="profile-section-title">Professional Details</h2>
+          <h2 className="profile-section-title">
+            {t("doctorProfile.professionalDetails")}
+          </h2>
           <div className="profile-form-grid">
             <div className="profile-field">
-              <label htmlFor="price">Consultation Price</label>
+              <label htmlFor="price">{t("doctorProfile.consultationPrice")}</label>
               <input
                 type="number"
                 name="price"
@@ -288,7 +336,9 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="years_of_experience">Years of Experience</label>
+              <label htmlFor="years_of_experience">
+                {t("doctorProfile.yearsOfExperience")}
+              </label>
               <input
                 type="number"
                 name="years_of_experience"
@@ -299,14 +349,14 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="specialization">Specialization</label>
+              <label htmlFor="specialization">{t("doctorProfile.specialization")}</label>
               <select
                 name="specialization"
                 id="specialization"
                 value={doctorForm.specialization}
                 onChange={handleChange}
               >
-                <option value="">Select specialization</option>
+                <option value="">{t("doctorProfile.selectSpecialization")}</option>
                 {specializations.map((specialization) => (
                   <option key={specialization.id} value={specialization.id}>
                     {specialization.name}
@@ -316,7 +366,24 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="medical_id">Medical ID</label>
+              <label htmlFor="city">{t("doctorProfile.city")}</label>
+              <select
+                name="city"
+                id="city"
+                value={doctorForm.city}
+                onChange={handleChange}
+              >
+                <option value="">{t("doctorProfile.selectCity")}</option>
+                {saudiCities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="medical_id">{t("doctorProfile.medicalId")}</label>
               <input
                 type="text"
                 name="medical_id"
@@ -328,13 +395,13 @@ function DoctorProfile() {
               />
               {medicalIdTouched && isMedicalIdInvalid ? (
                 <span className="profile-field-error">
-                  Medical ID must start with 10001.
+                  {t("doctorProfile.medicalIdError")}
                 </span>
               ) : null}
             </div>
 
             <div className="profile-field-wide">
-              <label htmlFor="clinic_name">Address</label>
+              <label htmlFor="clinic_name">{t("doctorProfile.address")}</label>
               <input
                 type="text"
                 name="clinic_name"
@@ -345,7 +412,7 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field-wide">
-              <label htmlFor="about_me">About Me</label>
+              <label htmlFor="about_me">{t("doctorProfile.aboutMe")}</label>
               <textarea
                 name="about_me"
                 id="about_me"
@@ -357,7 +424,7 @@ function DoctorProfile() {
         </section>
 
         <section>
-          <h2 className="profile-section-title">Clinic Location</h2>
+          <h2 className="profile-section-title">{t("doctorProfile.clinicLocation")}</h2>
           <DoctorLocationPicker
             latitude={doctorForm.latitude}
             longitude={doctorForm.longitude}
@@ -370,7 +437,7 @@ function DoctorProfile() {
           className="profile-save-button"
           disabled={isSaving || isMedicalIdInvalid}
         >
-          {isSaving ? "Saving..." : "Save Profile"}
+          {isSaving ? t("doctorProfile.saving") : t("doctorProfile.save")}
         </button>
       </form>
     </section>

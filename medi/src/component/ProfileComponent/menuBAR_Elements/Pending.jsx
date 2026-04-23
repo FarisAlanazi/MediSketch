@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../../../Auth/LoginLogic";
+import { useTranslation } from "react-i18next";
 import "../Profile_Style/profilePages.css";
 
-const getDoctorName = (appointment) => {
+const getDoctorName = (appointment, t) => {
   const fullName =
     `${appointment?.doctor?.user?.first_name ?? ""} ${
       appointment?.doctor?.user?.last_name ?? ""
     }`.trim();
 
-  return fullName || appointment?.doctor?.user?.username || "Doctor";
+  return fullName || appointment?.doctor?.user?.username || t("records.doctorFallback");
 };
 
 function Pending() {
+  const { t } = useTranslation();
   const [pendingAppointments, setPendingAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -37,7 +39,7 @@ function Pending() {
         setPendingAppointments(pendingOnly);
       } catch {
         if (isMounted) {
-          setLoadError("Unable to load pending requests right now.");
+          setLoadError(t("records.pendingError"));
         }
       } finally {
         if (isMounted) {
@@ -51,19 +53,19 @@ function Pending() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   return (
     <section className="profile-record-page">
       <header className="record-page-header">
-        <p>Pending</p>
-        <h1>Pending appointment requests</h1>
-        <span>See the requests that are still waiting for confirmation.</span>
+        <p>{t("records.pendingLabel")}</p>
+        <h1>{t("records.pendingTitle")}</h1>
+        <span>{t("records.pendingSubtitle")}</span>
       </header>
 
       <div className="record-card">
         {isLoading ? (
-          <div className="record-empty-state">Loading pending requests...</div>
+          <div className="record-empty-state">{t("records.loadingPending")}</div>
         ) : loadError ? (
           <div className="record-empty-state">{loadError}</div>
         ) : pendingAppointments.length ? (
@@ -72,31 +74,36 @@ function Pending() {
               <article key={appointment.id} className="record-item">
                 <div className="record-item-header">
                   <div>
-                    <h2>{getDoctorName(appointment)}</h2>
+                    <h2>{getDoctorName(appointment, t)}</h2>
                     <p className="record-item-meta">
                       {appointment?.doctor?.specialization ||
                         appointment?.doctor?.clinic_name ||
-                        "Pending request"}
+                        t("records.pendingRequest")}
                     </p>
                   </div>
 
                   <span className="record-status-pill record-status-pending">
-                    {appointment.status}
+                    {t(`status.${String(appointment.status ?? "").toLowerCase()}`, {
+                      defaultValue: appointment.status,
+                    })}
                   </span>
                 </div>
 
                 <p className="record-item-meta">
-                  Request date: {appointment.date} | Time: {appointment.time}
+                  {t("records.requestDateTime", {
+                    date: appointment.date,
+                    time: appointment.time,
+                  })}
                 </p>
                 <p className="record-item-note">
-                  This request has not been accepted or declined yet.
+                  {t("records.pendingWaiting")}
                 </p>
               </article>
             ))}
           </div>
         ) : (
           <div className="record-empty-state">
-            No pending appointment requests are waiting right now.
+            {t("records.noPending")}
           </div>
         )}
       </div>

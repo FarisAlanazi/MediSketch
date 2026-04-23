@@ -5,8 +5,11 @@ import { CiClock2 } from "react-icons/ci";
 import { MdEventAvailable } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
+import { useTranslation } from "react-i18next";
 
 function DoctorMainBar() {
+  const { t } = useTranslation();
+
   return (
     <div className="center-div">
       <section className="profile-tabs-shell">
@@ -14,7 +17,7 @@ function DoctorMainBar() {
           <li className="profile-tab-link">
             <Link to="/doctor/profile">
               <div className="profileLI">
-                Doctor Profile
+                {t("profileTabs.doctorProfile")}
                 <span>
                   <FaUserAlt size={20} />
                 </span>
@@ -24,7 +27,7 @@ function DoctorMainBar() {
           <li className="profile-tab-link">
             <Link to="/doctor/appointments">
               <div className="profileLI">
-                Appointments
+                {t("profileTabs.appointments")}
                 <span>
                   <MdEventAvailable size={20} />
                 </span>
@@ -34,7 +37,7 @@ function DoctorMainBar() {
           <li className="profile-tab-link">
             <Link to="/doctor/pending-requests">
               <div className="profileLI">
-                Requests
+                {t("profileTabs.requests")}
                 <span>
                   <CiClock2 size={20} />
                 </span>
@@ -44,7 +47,7 @@ function DoctorMainBar() {
           <li className="profile-tab-link">
             <Link to="/doctor/dashboard">
               <div className="profileLI">
-                Dashboard
+                {t("profileTabs.dashboard")}
                 <span>
                   <RxDashboard size={20} />
                 </span>

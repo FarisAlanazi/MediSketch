@@ -1,85 +1,90 @@
-import { useEffect, useMemo, useState } from "react"; // Import the basic hooks needed to load doctors once and prepare simple map data.
-import api from "../Auth/LoginLogic"; // Import the shared API helper so this page uses the existing backend connection.
-import Map from "../Components/Map/Map"; // Import the new map component so almost all map logic stays in one place.
+import { useEffect, useMemo, useState } from "react";
+import api from "../Auth/LoginLogic";
+import Map from "../Components/Map/Map";
+import { useTranslation } from "react-i18next";
 
 const pageCardStyle = {
   width: "100%",
   padding: "1rem 0 0",
-}; // Keep the page wrapper style small and local so no extra stylesheet is needed.
+};
 
 const parseCoordinate = (value) => {
   const parsedValue = Number(value); // Convert the incoming latitude or longitude into a number so the map can use it.
   return Number.isFinite(parsedValue) ? parsedValue : null; // Return a valid number when possible, or null when the value is missing.
-}; // Keep the coordinate conversion as one tiny helper because both latitude and longitude need the same check.
+};
 
 function DiscoverDoctorsMap() {
-  const [doctors, setDoctors] = useState([]); // Store the full doctor list so the page can build the map markers from it.
-  const [isLoading, setIsLoading] = useState(true); // Track the loading state so the page can show a simple status message.
-  const [loadError, setLoadError] = useState(""); // Track loading errors so the page can show one small fallback message.
+  const { t } = useTranslation();
+  const [doctors, setDoctors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    let isMounted = true; // Track whether the page is still mounted before updating state after the request finishes.
+    let isMounted = true;
 
     const loadDoctors = async () => {
-      setIsLoading(true); // Start the loading state before requesting doctors.
-      setLoadError(""); // Clear any old error message before the new request starts.
+      setIsLoading(true);
+      setLoadError("");
 
       try {
-        const response = await api.get("/doctors/"); // Load the existing doctors endpoint because it already supplies the data needed by the map.
+        const response = await api.get("/doctors/");
 
         if (!isMounted) {
-          return; // Stop here when the page has already unmounted so React state is not updated after cleanup.
+          return;
         }
 
-        setDoctors(Array.isArray(response.data) ? response.data : []); // Save the doctor list only when the response is a normal array.
+        setDoctors(Array.isArray(response.data) ? response.data : []);
       } catch {
         if (!isMounted) {
-          return; // Stop here when the page is gone because there is no visible state left to update.
+          return;
         }
 
-        setDoctors([]); // Clear the doctor list when the request fails so the map does not try to render stale data.
-        setLoadError("Unable to load doctors on the map right now."); // Show one small readable error message instead of failing silently.
+        setDoctors([]);
+        setLoadError(t("map.loadError"));
       } finally {
         if (isMounted) {
-          setIsLoading(false); // End the loading state only while the page is still mounted.
+          setIsLoading(false);
         }
       }
-    }; // Keep the request logic inside one local async function so the effect stays easy to read.
+    };
 
-    loadDoctors(); // Run the doctor request as soon as the page opens.
+    loadDoctors();
 
     return () => {
-      isMounted = false; // Mark the page as unmounted so late responses do not update state.
+      isMounted = false;
     };
-  }, []); // Load the doctors only once because this page only needs an initial list.
+  }, [t]);
 
   const mappedDoctors = useMemo(
     () =>
       doctors
         .map((doctor) => ({
-          id: doctor.id, // Keep the doctor id because React list rendering still needs a stable key.
-          detailsId: doctor.user?.id ?? doctor.id, // Reuse the existing doctor details route key so marker clicks open the correct profile.
-          name: `${doctor?.user?.first_name ?? ""} ${doctor?.user?.last_name ?? ""}`.trim() || "Doctor profile", // Build one simple display name for the marker.
-          specialization: doctor.specialization || "General care", // Show the current specialization when it exists, or a small fallback label.
-          rating: doctor.rating ?? "No ratings yet", // Reuse the backend rating field so the popup shows the same rating source as the list page.
-          latitude: parseCoordinate(doctor.latitude ?? doctor.lititude), // Read latitude from the existing doctor location fields.
-          longitude: parseCoordinate(doctor.longitude ?? doctor.langitude), // Read longitude from the existing doctor location fields.
+          id: doctor.id,
+          detailsId: doctor.user?.id ?? doctor.id,
+          name:
+            `${doctor?.user?.first_name ?? ""} ${doctor?.user?.last_name ?? ""}`.trim() ||
+            t("map.profileFallback"),
+          specialization:
+            doctor.specialization || t("map.specializationFallback"),
+          rating: doctor.rating ?? t("doctors.noRatings"),
+          latitude: parseCoordinate(doctor.latitude ?? doctor.lititude),
+          longitude: parseCoordinate(doctor.longitude ?? doctor.langitude),
         }))
         .filter(
           (doctor) =>
             Number.isFinite(doctor.latitude) && Number.isFinite(doctor.longitude),
-        ), // Keep only doctors with usable coordinates because the map needs real positions for markers.
-    [doctors],
-  ); // Rebuild the marker data only when the doctor list changes.
+        ),
+    [doctors, t],
+  );
 
   if (isLoading) {
     return (
       <section className="find-doctors-page">
         <div className="find-doctors-shell">
-          <div className="doctor-empty-state">Loading doctors on the map...</div>
+          <div className="doctor-empty-state">{t("map.loading")}</div>
         </div>
       </section>
-    ); // Reuse the current doctor page styles so the loading state stays visually consistent.
+    );
   }
 
   if (loadError) {
@@ -97,17 +102,14 @@ function DiscoverDoctorsMap() {
       <div className="find-doctors-shell">
         <header className="find-doctors-header">
           <div>
-            <p className="find-doctors-label">Discover Doctors</p>
-            <h1>Discover Doctors on Map</h1>
-            <p className="find-doctors-subtitle">
-              Browse doctors on the map and open any doctor profile by clicking
-              its marker.
-            </p>
+            <p className="find-doctors-label">{t("map.label")}</p>
+            <h1>{t("map.title")}</h1>
+            <p className="find-doctors-subtitle">{t("map.subtitle")}</p>
           </div>
         </header>
 
         <div className="find-doctors-results-bar">
-          <p>{mappedDoctors.length} doctors with saved map locations</p>
+          <p>{t("map.results", { count: mappedDoctors.length })}</p>
         </div>
 
         <div style={pageCardStyle}>
@@ -116,13 +118,13 @@ function DiscoverDoctorsMap() {
 
         {!mappedDoctors.length ? (
           <div className="doctor-empty-state">
-            <h2>No doctor locations are available yet.</h2>
-            <p>Doctors appear here after saving their clinic location.</p>
+            <h2>{t("map.emptyTitle")}</h2>
+            <p>{t("map.emptyBody")}</p>
           </div>
         ) : null}
       </div>
     </section>
-  ); // Reuse the current doctor page shell so the new page stays close to the existing style.
+  );
 }
 
-export default DiscoverDoctorsMap; // Export the page so the router can render it in place of the old How it works page.
+export default DiscoverDoctorsMap;

@@ -1,5 +1,6 @@
 import img from "../../assets/doctor-with-his-arms-crossed-white-background.jpg";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const formatBadgeLabel = (value) => {
   const normalizedValue = String(value ?? "").trim();
@@ -23,21 +24,28 @@ export default function DoctorCards({
   detailsId,
   id,
 }) {
+  const { t } = useTranslation();
   const hasRating = Number.isFinite(rating);
   const hasPrice = Number.isFinite(price);
   const hasExperience = Number.isFinite(experience);
   const normalizedGender = String(gender ?? "")
     .trim()
     .toLowerCase();
+  const genderLabel =
+    normalizedGender === "male"
+      ? t("doctors.male")
+      : normalizedGender === "female"
+        ? t("doctors.female")
+        : formatBadgeLabel(gender);
 
   return (
     <article className="doctor-card">
       <div className="doctor-card-top">
         <p className="doctor-rating-badge">
-          {hasRating ? `★ ${rating.toFixed(1)}` : "No ratings yet"}
+          {hasRating ? `★ ${rating.toFixed(1)}` : t("doctors.noRatings")}
         </p>
         <p className="doctor-price-badge">
-          {hasPrice ? `$${price}` : "Price unavailable"}
+          {hasPrice ? `$${price}` : t("doctors.priceUnavailable")}
         </p>
       </div>
 
@@ -57,12 +65,14 @@ export default function DoctorCards({
             {firstname} {lastname}
           </h2>
 
-          <p className="doctor-location">{clinic || "Location not listed"}</p>
+          <p className="doctor-location">
+            {clinic || t("doctors.locationNotListed")}
+          </p>
 
           <div className="doctor-card-meta">
             {hasExperience ? (
               <span className="doctor-meta-badge">
-                {experience} years experience
+                {t("doctors.yearsExperience", { count: experience })}
               </span>
             ) : null}
 
@@ -76,7 +86,7 @@ export default function DoctorCards({
                       : "gender-badge-neutral"
                 }`}
               >
-                {formatBadgeLabel(gender)}
+                {genderLabel}
               </span>
             ) : null}
           </div>
@@ -96,7 +106,7 @@ export default function DoctorCards({
               to={`/DoctorDetails/${detailsId ?? id}`}
               className="doctor-view-button"
             >
-              View Profile
+              {t("doctors.viewProfile")}
             </Link>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../Auth/LoginLogic";
 import { useAuth } from "../../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 import "./detailsStyles/styles.css";
 
 const getErrorMessage = (error, fallbackMessage) => {
@@ -16,14 +17,14 @@ const getErrorMessage = (error, fallbackMessage) => {
   return fallbackMessage;
 };
 
-const formatSlotLabel = (slot) => {
+const formatSlotLabel = (slot, language, t) => {
   const parsedDate = new Date(`${slot.date}T${slot.time}`);
 
   if (Number.isNaN(parsedDate.getTime())) {
-    return `${slot.date} at ${String(slot.time).slice(0, 5)}`;
+    return `${slot.date} ${t("booking.at")} ${String(slot.time).slice(0, 5)}`;
   }
 
-  return parsedDate.toLocaleString(undefined, {
+  return parsedDate.toLocaleString(language, {
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -33,6 +34,7 @@ const formatSlotLabel = (slot) => {
 };
 
 function CalendarForm({ doctor }) {
+  const { t, i18n } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlotId, setSelectedSlotId] = useState("");
@@ -86,7 +88,7 @@ function CalendarForm({ doctor }) {
 
         setAvailableSlots([]);
         setSelectedSlotId("");
-        setSlotsError("Unable to load available times right now.");
+        setSlotsError(t("booking.loadError"));
       } finally {
         if (isMounted) {
           setSlotsLoading(false);
@@ -99,7 +101,7 @@ function CalendarForm({ doctor }) {
     return () => {
       isMounted = false;
     };
-  }, [doctor?.id, isAuthenticated, user?.user_type]);
+  }, [doctor?.id, isAuthenticated, t, user?.user_type]);
 
   const handleSubmission = async (event) => {
     event.preventDefault();
@@ -107,7 +109,7 @@ function CalendarForm({ doctor }) {
     if (!isAuthenticated) {
       setStatusMessage({
         type: "error",
-        text: "Please log in before booking an appointment.",
+        text: t("booking.loginBeforeBooking"),
       });
       return;
     }
@@ -115,7 +117,7 @@ function CalendarForm({ doctor }) {
     if (user?.user_type !== "patient") {
       setStatusMessage({
         type: "error",
-        text: "Only patient accounts can book appointments.",
+        text: t("booking.patientOnly"),
       });
       return;
     }
@@ -127,7 +129,7 @@ function CalendarForm({ doctor }) {
     if (!selectedSlot) {
       setStatusMessage({
         type: "error",
-        text: "Please select one of the available times.",
+        text: t("booking.selectTime"),
       });
       return;
     }
@@ -150,13 +152,13 @@ function CalendarForm({ doctor }) {
       setSelectedSlotId(remainingSlots[0] ? String(remainingSlots[0].id) : "");
       setStatusMessage({
         type: "success",
-        text: "Your appointment request was submitted successfully.",
+        text: t("booking.success"),
       });
-      toast.success("Appointment booked successfully!");
+      toast.success(t("booking.successToast"));
     } catch (error) {
       const safeMessage = getErrorMessage(
         error,
-        "We could not submit the appointment request.",
+        t("booking.submitError"),
       );
 
       setStatusMessage({ type: "error", text: safeMessage });
@@ -168,29 +170,21 @@ function CalendarForm({ doctor }) {
 
   return (
     <form className="details-card booking-card" onSubmit={handleSubmission}>
-      <p className="details-card-label">Booking</p>
-      <h2>Book an appointment</h2>
-      <p className="booking-support-text">
-        Choose one of the doctor's available times and send a real appointment
-        request.
-      </p>
+      <p className="details-card-label">{t("booking.label")}</p>
+      <h2>{t("booking.title")}</h2>
+      <p className="booking-support-text">{t("booking.subtitle")}</p>
 
       {!isAuthenticated ? (
-        <p className="booking-auth-note">
-          Log in with a patient account to see available times and book this
-          doctor.
-        </p>
+        <p className="booking-auth-note">{t("booking.loginNote")}</p>
       ) : user?.user_type !== "patient" ? (
-        <p className="booking-auth-note">
-          Only patient accounts can book appointments.
-        </p>
+        <p className="booking-auth-note">{t("booking.patientOnly")}</p>
       ) : slotsLoading ? (
-        <p className="booking-auth-note">Loading available times...</p>
+        <p className="booking-auth-note">{t("booking.loading")}</p>
       ) : slotsError ? (
         <p className="booking-status booking-status-error">{slotsError}</p>
       ) : availableSlots.length ? (
         <label className="booking-field">
-          <span>Available time</span>
+          <span>{t("booking.fieldLabel")}</span>
           <select
             name="slot"
             value={selectedSlotId}
@@ -198,15 +192,13 @@ function CalendarForm({ doctor }) {
           >
             {availableSlots.map((slot) => (
               <option key={slot.id} value={slot.id}>
-                {formatSlotLabel(slot)}
+                {formatSlotLabel(slot, i18n.language, t)}
               </option>
             ))}
           </select>
         </label>
       ) : (
-        <p className="booking-auth-note">
-          No available times are listed for this doctor right now.
-        </p>
+        <p className="booking-auth-note">{t("booking.empty")}</p>
       )}
 
       {statusMessage.text ? (
@@ -226,7 +218,7 @@ function CalendarForm({ doctor }) {
           !availableSlots.length
         }
       >
-        {isSubmitting ? "Submitting..." : "Book Now"}
+        {isSubmitting ? t("booking.submitting") : t("booking.submit")}
       </button>
     </form>
   );

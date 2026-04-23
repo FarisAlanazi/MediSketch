@@ -1,4 +1,5 @@
 import fallbackDoctorImg from "../../assets/doctor-with-his-arms-crossed-white-background.jpg";
+import { useTranslation } from "react-i18next";
 
 const Cards = ({
   first_name,
@@ -10,9 +11,17 @@ const Cards = ({
   experience,
   specialization,
 }) => {
+  const { t } = useTranslation();
   const imgSrc = img || fallbackDoctorImg;
   const clinicLabel =
     typeof clinic === "string" ? clinic : clinic?.name || clinic?.address;
+  const normalizedGender = String(gender ?? "").trim().toLowerCase();
+  const genderLabel =
+    normalizedGender === "male"
+      ? t("doctors.male")
+      : normalizedGender === "female"
+        ? t("doctors.female")
+        : gender;
 
   return (
     <>
@@ -31,10 +40,14 @@ const Cards = ({
             <h4>{`${first_name} ${last_name}`}</h4>
             {clinicLabel ? <p className="card-location">{clinicLabel}</p> : null}
             <div className="doctor-card-meta">
-              {experience ? <span>{experience} years experience</span> : null}
-              {gender ? <span>{gender}</span> : null}
+              {experience ? (
+                <span>
+                  {t("homeCards.yearsExperience", { count: experience })}
+                </span>
+              ) : null}
+              {gender ? <span>{genderLabel}</span> : null}
             </div>
-            <button className="buttonForBook">Book Now</button>
+            <button className="buttonForBook">{t("homeCards.bookNow")}</button>
           </section>
         </div>
       </div>

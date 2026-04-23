@@ -1,40 +1,35 @@
 import { useState } from "react";
 import "../../SearchAndCardStyle/searchComponentStyle.css";
 import doctorImg from "../../assets/imgs/DoctorOnPhone.png";
+import { useTranslation } from "react-i18next";
 function SearchComponent() {
+  const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState();
   return (
     <div className="container">
       <div className="divWithInput">
         <h1>
-          Find your doctor & <span>book instantly</span>
+          {t("hero.titleStart")} <span>{t("hero.titleHighlight")}</span>
         </h1>
-        <p id="paragraph">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim sunt
-          repudiandae error consequatur a. Officiis ut velit vel ipsam expedita
-          nisi, nostrum ducimus aliquid, atque assumenda exercitationem nihil
-          tenetur. Expedita.
-        </p>
+        <p id="paragraph">{t("hero.description")}</p>
         <div className="searchShell">
           <input
             type="search"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search doctors, specialties, clinics"
-            aria-label="Search doctors"
+            placeholder={t("hero.placeholder")}
+            aria-label={t("hero.aria")}
           />
           <span className="searchShellButton" aria-hidden="true">
-            Search
+            {t("hero.button")}
           </span>
         </div>
-        <p className="searchHelperNote">
-          Search by specialty, clinic, or doctor name to get started.
-        </p>
+        <p className="searchHelperNote">{t("hero.helper")}</p>
       </div>
       <div className="imgClass">
         <img
           src={doctorImg}
-          alt="Doctor consulting by phone"
+          alt={t("hero.imageAlt")}
           className="doctorImg"
         />
       </div>

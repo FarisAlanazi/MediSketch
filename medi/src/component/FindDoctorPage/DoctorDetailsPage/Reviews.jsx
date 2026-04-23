@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../Auth/LoginLogic";
 import { useAuth } from "../../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 import "./detailsStyles/reviews.css";
 
 const getErrorMessage = (error, fallbackMessage) => {
@@ -16,14 +17,14 @@ const getErrorMessage = (error, fallbackMessage) => {
   return fallbackMessage;
 };
 
-const formatAppointmentLabel = (appointment) => {
+const formatAppointmentLabel = (appointment, language, t) => {
   const parsedDate = new Date(`${appointment.date}T${appointment.time}`);
 
   if (Number.isNaN(parsedDate.getTime())) {
-    return `${appointment.date} at ${String(appointment.time).slice(0, 5)}`;
+    return `${appointment.date} ${t("reviews.at")} ${String(appointment.time).slice(0, 5)}`;
   }
 
-  return parsedDate.toLocaleString(undefined, {
+  return parsedDate.toLocaleString(language, {
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -42,6 +43,7 @@ function Reviews({
   errorMessage,
   onRefresh,
 }) {
+  const { t, i18n } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const [doctorAppointments, setDoctorAppointments] = useState([]);
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
@@ -131,7 +133,7 @@ function Reviews({
         }
 
         setDoctorAppointments([]);
-        setAppointmentsError("Unable to load your appointments for feedback.");
+        setAppointmentsError(t("reviews.appointmentsError"));
       } finally {
         if (isMounted) {
           setAppointmentsLoading(false);
@@ -144,7 +146,7 @@ function Reviews({
     return () => {
       isMounted = false;
     };
-  }, [doctorId, feedbackEntries, isAuthenticated, user?.user_type]);
+  }, [doctorId, feedbackEntries, isAuthenticated, t, user?.user_type]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -152,7 +154,7 @@ function Reviews({
     if (!isAuthenticated) {
       setFormStatus({
         type: "error",
-        text: "Please log in before submitting feedback.",
+        text: t("reviews.loginBeforeFeedback"),
       });
       return;
     }
@@ -160,7 +162,7 @@ function Reviews({
     if (user?.user_type !== "patient") {
       setFormStatus({
         type: "error",
-        text: "Only patient accounts can submit feedback.",
+        text: t("reviews.patientOnly"),
       });
       return;
     }
@@ -168,7 +170,7 @@ function Reviews({
     if (!feedbackForm.appointment) {
       setFormStatus({
         type: "error",
-        text: "Select an appointment before leaving feedback.",
+        text: t("reviews.selectAppointment"),
       });
       return;
     }
@@ -176,7 +178,7 @@ function Reviews({
     if (!feedbackForm.feedback.trim()) {
       setFormStatus({
         type: "error",
-        text: "Please add a short review before submitting.",
+        text: t("reviews.addReview"),
       });
       return;
     }
@@ -199,14 +201,14 @@ function Reviews({
       }));
       setFormStatus({
         type: "success",
-        text: "Your feedback was submitted successfully.",
+        text: t("reviews.success"),
       });
-      toast.success("Feedback submitted successfully!");
+      toast.success(t("reviews.successToast"));
       onRefresh?.();
     } catch (error) {
       const safeMessage = getErrorMessage(
         error,
-        "We could not submit your feedback right now.",
+        t("reviews.submitError"),
       );
 
       setFormStatus({ type: "error", text: safeMessage });
@@ -220,30 +222,24 @@ function Reviews({
     <section className="details-card reviews-card">
       <div className="details-section-heading">
         <div>
-          <p className="details-card-label">Feedback</p>
-          <h2>Ratings and comments</h2>
+          <p className="details-card-label">{t("reviews.label")}</p>
+          <h2>{t("reviews.title")}</h2>
         </div>
 
         <div className="reviews-summary-chip">
           <strong>{reviewCount ? averageRating.toFixed(1) : "0.0"}</strong>
-          <span>
-            {reviewCount} review{reviewCount === 1 ? "" : "s"}
-          </span>
+          <span>{t("doctorDetails.reviewsCount", { count: reviewCount })}</span>
         </div>
       </div>
 
       {!isAuthenticated ? (
         <p className="feedback-auth-note">
-          Log in with a patient account to leave feedback for this doctor.
+          {t("reviews.loginNote")}
         </p>
       ) : user?.user_type !== "patient" ? (
-        <p className="feedback-auth-note">
-          Only patient accounts can submit feedback.
-        </p>
+        <p className="feedback-auth-note">{t("reviews.patientOnly")}</p>
       ) : appointmentsLoading ? (
-        <p className="feedback-auth-note">
-          Loading your appointments for this doctor...
-        </p>
+        <p className="feedback-auth-note">{t("reviews.loadingAppointments")}</p>
       ) : appointmentsError ? (
         <p className="feedback-status feedback-status-error">
           {appointmentsError}
@@ -252,7 +248,7 @@ function Reviews({
         <form className="feedback-form" onSubmit={handleSubmit}>
           <div className="feedback-form-grid">
             <label className="feedback-field feedback-field-wide">
-              <span>Appointment</span>
+              <span>{t("reviews.appointment")}</span>
               <select
                 name="appointment"
                 value={feedbackForm.appointment}
@@ -260,35 +256,35 @@ function Reviews({
               >
                 {eligibleAppointments.map((appointment) => (
                   <option key={appointment.id} value={appointment.id}>
-                    {formatAppointmentLabel(appointment)}
+                    {formatAppointmentLabel(appointment, i18n.language, t)}
                   </option>
                 ))}
               </select>
             </label>
 
             <label className="feedback-field">
-              <span>Rating</span>
+              <span>{t("reviews.rating")}</span>
               <select
                 name="rating"
                 value={feedbackForm.rating}
                 onChange={handleChange}
               >
-                <option value="5">5 - Excellent</option>
-                <option value="4">4 - Very good</option>
-                <option value="3">3 - Good</option>
-                <option value="2">2 - Fair</option>
-                <option value="1">1 - Poor</option>
+                <option value="5">5 - {t("reviews.excellent")}</option>
+                <option value="4">4 - {t("reviews.veryGood")}</option>
+                <option value="3">3 - {t("reviews.good")}</option>
+                <option value="2">2 - {t("reviews.fair")}</option>
+                <option value="1">1 - {t("reviews.poor")}</option>
               </select>
             </label>
 
             <label className="feedback-field feedback-field-wide">
-              <span>Comment</span>
+              <span>{t("reviews.comment")}</span>
               <textarea
                 name="feedback"
                 rows="4"
                 value={feedbackForm.feedback}
                 onChange={handleChange}
-                placeholder="Share a short comment about your visit."
+                placeholder={t("reviews.commentPlaceholder")}
               />
             </label>
           </div>
@@ -304,21 +300,17 @@ function Reviews({
             className="feedback-submit-button"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Submitting..." : "Submit Feedback"}
+            {isSubmitting ? t("reviews.submitting") : t("reviews.submit")}
           </button>
         </form>
       ) : doctorAppointments.length && hasNonDeclinedAppointments ? (
-        <p className="feedback-auth-note">
-          Every appointment with this doctor has already been reviewed.
-        </p>
+        <p className="feedback-auth-note">{t("reviews.allReviewed")}</p>
       ) : (
-        <p className="feedback-auth-note">
-          Book an appointment with this doctor before leaving feedback.
-        </p>
+        <p className="feedback-auth-note">{t("reviews.bookFirst")}</p>
       )}
 
       {isLoading ? (
-        <div className="reviewsState">Loading reviews...</div>
+        <div className="reviewsState">{t("reviews.loadingReviews")}</div>
       ) : errorMessage ? (
         <div className="reviewsState reviewsStateError">{errorMessage}</div>
       ) : reviews.length ? (
@@ -334,7 +326,7 @@ function Reviews({
                 <div className="reviewItemRating">
                   {Number.isFinite(review.rating)
                     ? `${review.rating.toFixed(1)} / 5`
-                    : "No rating"}
+                    : t("doctorDetails.noRatingValue")}
                 </div>
               </div>
 
@@ -343,7 +335,7 @@ function Reviews({
           ))}
         </div>
       ) : (
-        <div className="reviewsState">No ratings or comments yet.</div>
+        <div className="reviewsState">{t("doctorDetails.noRatingsOrComments")}</div>
       )}
     </section>
   );

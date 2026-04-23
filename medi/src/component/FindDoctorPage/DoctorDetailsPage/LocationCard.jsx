@@ -1,4 +1,5 @@
 import "./detailsStyles/styles.css";
+import { useTranslation } from "react-i18next";
 
 const TABUK_CENTER = {
   latitude: 28.3838,
@@ -35,6 +36,7 @@ const buildMapEmbedSrc = (latitude, longitude) => {
 };
 
 function LocationCard({ doctorName, locationLabel, latitude, longitude }) {
+  const { t } = useTranslation();
   const parsedLatitude = parseCoordinate(latitude);
   const parsedLongitude = parseCoordinate(longitude);
   const hasExactLocation =
@@ -47,15 +49,15 @@ function LocationCard({ doctorName, locationLabel, latitude, longitude }) {
     <section className="details-card map-card">
       <div className="details-section-heading">
         <div>
-          <p className="details-card-label">Location</p>
-          <h2>Doctor Location</h2>
+          <p className="details-card-label">{t("doctorDetails.location")}</p>
+          <h2>{t("doctorDetails.locationTitle")}</h2>
         </div>
         <p className="map-location-text">{locationLabel}</p>
       </div>
 
       <div className="map-frame-shell">
         <iframe
-          title={`Map for ${doctorName}`}
+          title={t("locationCard.iframeTitle", { name: doctorName })}
           src={buildMapEmbedSrc(
             hasExactLocation ? parsedLatitude : null,
             hasExactLocation ? parsedLongitude : null,
@@ -67,8 +69,8 @@ function LocationCard({ doctorName, locationLabel, latitude, longitude }) {
 
       <p className="map-note">
         {hasExactLocation
-          ? "The map stays centered on Tabuk and marks the doctor's recorded coordinates."
-          : "Exact doctor location unavailable. The map remains centered on Tabuk, Saudi Arabia."}
+          ? t("locationCard.exact")
+          : t("locationCard.fallback")}
       </p>
     </section>
   );

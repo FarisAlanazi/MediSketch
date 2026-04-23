@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import DoctorCards from "./DoctorCards";
 import api from "../../Auth/LoginLogic";
+import saudiCities from "../../constants/saudiCities";
+import { useTranslation } from "react-i18next";
 import "./findDoctorPage.css";
 
 const normalizeText = (value) =>
@@ -46,14 +48,13 @@ const getAvailableDays = (doctor) => {
     .map((day) =>
       typeof day === "string"
         ? day
-        : day?.day ?? day?.weekday ?? day?.name ?? day?.label,
+        : (day?.day ?? day?.weekday ?? day?.name ?? day?.label),
     )
     .filter(Boolean)
     .slice(0, 4);
 };
 
 const mapDoctorForView = (doctor) => ({
-  id: doctor.id,
   detailsId: doctor.user?.id ?? doctor.id,
   firstname: doctor.user?.first_name ?? "",
   lastname: doctor.user?.last_name ?? "",
@@ -69,14 +70,16 @@ const mapDoctorForView = (doctor) => ({
       doctor.review_rating ??
       doctor.user?.rating,
   ),
-  city: String(doctor.city ?? "").trim(), // Read the simple city value from the backend so the page does not need to rebuild it.
+  city: String(doctor.city ?? "").trim(),
   clinic: getClinicLabel(doctor),
   availableDays: getAvailableDays(doctor),
 });
 
 export default function Doctors() {
+  const { t } = useTranslation();
   const [doctors, setDoctors] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("all"); // Store the chosen city so it can be combined with the current filters.
+  const [searchName, setSearchName] = useState("");
+  const [selectedCity, setSelectedCity] = useState("all");
   const [selectedGender, setSelectedGender] = useState("all");
   const [selectedMinRating, setSelectedMinRating] = useState("all");
   const [selectedMaxPrice, setSelectedMaxPrice] = useState("all");
@@ -85,7 +88,6 @@ export default function Doctors() {
     try {
       const response = await api.get("/doctors/");
       setDoctors(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching doctors:", error);
     }
@@ -112,20 +114,19 @@ export default function Doctors() {
       ].sort((left, right) => left - right),
     [preparedDoctors],
   );
-  const cityOptions = useMemo(
-    () =>
-      [...new Set(preparedDoctors.map((doctor) => doctor.view.city).filter(Boolean))].sort(
-        (left, right) => left.localeCompare(right),
-      ), // Build one clean city list from the fetched doctors so the dropdown stays simple.
-    [preparedDoctors],
-  );
-
   const filteredDoctors = useMemo(() => {
     return preparedDoctors.filter((doctor) => {
-      const normalizedCity = normalizeText(doctor.view.city); // Normalize the city text so dropdown matching stays simple.
+      const normalizedDoctorName = normalizeText(
+        `${doctor.view.firstname} ${doctor.view.lastname}`,
+      );
+      const normalizedCity = normalizeText(doctor.view.city);
       const normalizedGender = normalizeText(doctor.view.gender);
+      const passesName =
+        normalizeText(searchName) === "" ||
+        normalizedDoctorName.includes(normalizeText(searchName));
       const passesCity =
-        selectedCity === "all" || normalizedCity === selectedCity; // Allow all cities by default, or match the selected city.
+        selectedCity === "all" ||
+        normalizedCity === normalizeText(selectedCity);
       const passesGender =
         selectedGender === "all" || normalizedGender === selectedGender;
 
@@ -141,10 +142,13 @@ export default function Doctors() {
           : Number.isFinite(doctor.view.rating) &&
             doctor.view.rating >= Number(selectedMinRating);
 
-      return passesCity && passesGender && passesPrice && passesRating;
+      return (
+        passesName && passesCity && passesGender && passesPrice && passesRating
+      );
     });
   }, [
     preparedDoctors,
+    searchName,
     selectedCity,
     selectedGender,
     selectedMaxPrice,
@@ -152,6 +156,7 @@ export default function Doctors() {
   ]);
 
   const clearAllFilters = () => {
+    setSearchName("");
     setSelectedCity("all");
     setSelectedGender("all");
     setSelectedMinRating("all");
@@ -163,30 +168,32 @@ export default function Doctors() {
       <div className="find-doctors-shell">
         <header className="find-doctors-header">
           <div>
-            <p className="find-doctors-label">Find Doctors</p>
-            <h1>Browse specialists with clear, simple filters</h1>
-            <p className="find-doctors-subtitle">
-              Refine the list by consultation fee, rating, and gender while
-              keeping the experience light and easy to scan.
-            </p>
+            <p className="find-doctors-label">{t("doctors.pageLabel")}</p>
+            <h1>{t("doctors.pageTitle")}</h1>
+            <p className="find-doctors-subtitle">{t("doctors.pageSubtitle")}</p>
           </div>
         </header>
 
         <section className="find-doctors-filters" aria-label="Doctor filters">
           <label className="filter-field filter-field-search">
-            <span>Symptom</span>
-            <input type="search" placeholder="Search by symptom" />
+            <span>{t("doctors.searchLabel")}</span>
+            <input
+              type="search"
+              placeholder={t("doctors.searchPlaceholder")}
+              value={searchName}
+              onChange={(event) => setSearchName(event.target.value)}
+            />
           </label>
 
           <label className="filter-field">
-            <span>City</span>
+            <span>{t("doctors.city")}</span>
             <select
               value={selectedCity}
               onChange={(event) => setSelectedCity(event.target.value)}
             >
-              <option value="all">All Cities</option>
-              {cityOptions.map((city) => (
-                <option key={city} value={normalizeText(city)}>
+              <option value="all">{t("doctors.allCities")}</option>
+              {saudiCities.map((city) => (
+                <option key={city} value={city}>
                   {city}
                 </option>
               ))}
@@ -194,42 +201,42 @@ export default function Doctors() {
           </label>
 
           <label className="filter-field">
-            <span>Gender</span>
+            <span>{t("doctors.gender")}</span>
             <select
               value={selectedGender}
               onChange={(event) => setSelectedGender(event.target.value)}
             >
-              <option value="all">All Genders</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
+              <option value="all">{t("doctors.allGenders")}</option>
+              <option value="male">{t("doctors.male")}</option>
+              <option value="female">{t("doctors.female")}</option>
             </select>
           </label>
 
           <label className="filter-field">
-            <span>Max Price</span>
+            <span>{t("doctors.maxPrice")}</span>
             <select
               value={selectedMaxPrice}
               onChange={(event) => setSelectedMaxPrice(event.target.value)}
             >
-              <option value="all">All Prices</option>
+              <option value="all">{t("doctors.allPrices")}</option>
               {priceOptions.map((price) => (
                 <option key={price} value={price}>
-                  Up to ${price}
+                  {t("doctors.upToPrice", { price })}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="filter-field">
-            <span>Min Rating</span>
+            <span>{t("doctors.minRating")}</span>
             <select
               value={selectedMinRating}
               onChange={(event) => setSelectedMinRating(event.target.value)}
             >
-              <option value="all">All Ratings</option>
-              <option value="4">4.0+</option>
-              <option value="4.5">4.5+</option>
-              <option value="4.8">4.8+</option>
+              <option value="all">{t("doctors.allRatings")}</option>
+              <option value="4">{t("doctors.rating4")}</option>
+              <option value="4.5">{t("doctors.rating45")}</option>
+              <option value="4.8">{t("doctors.rating48")}</option>
             </select>
           </label>
 
@@ -238,12 +245,12 @@ export default function Doctors() {
             className="clear-filters-button"
             onClick={clearAllFilters}
           >
-            Clear all filters
+            {t("doctors.clearAll")}
           </button>
         </section>
 
         <div className="find-doctors-results-bar">
-          <p>{filteredDoctors.length} results found</p>
+          <p>{t("doctors.resultsFound", { count: filteredDoctors.length })}</p>
         </div>
 
         <div className="doctor-results-grid">
@@ -267,8 +274,8 @@ export default function Doctors() {
 
         {preparedDoctors.length > 0 && filteredDoctors.length === 0 ? (
           <div className="doctor-empty-state">
-            <h2>No doctors match the current filters.</h2>
-            <p>Try clearing one or more filters to see more specialists.</p>
+            <h2>{t("doctors.noMatchTitle")}</h2>
+            <p>{t("doctors.noMatchBody")}</p>
           </div>
         ) : null}
       </div>

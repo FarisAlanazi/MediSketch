@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import HomePage from "./Pages/HomePage";
 import Login from "./component/LoginComponents/Login";
-import { Route, Routes, Link } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import NavbarComponent from "./component/BoilerplateComponents/NavbarComponent";
 import Register from "./component/RegisterComponent/Register";
 import { ToastContainer } from "react-toastify";
@@ -18,14 +19,23 @@ import DoctorAppointments from "./component/ProfileComponent/DoctorProfile/Docto
 import DoctorPendingRequests from "./component/ProfileComponent/DoctorProfile/DoctorPendingRequests";
 import DoctorDash from "./component/ProfileComponent/DoctorProfile/DrDashboard";
 import DoctorDetails from "./component/FindDoctorPage/DoctorDetailsPage/DoctorDetails";
-import DiscoverDoctorsMap from "./Pages/DiscoverDoctorsMap"; // Import the new map page so the old How it works slot can be replaced.
+import DiscoverDoctorsMap from "./Pages/DiscoverDoctorsMap";
+import { useTranslation } from "react-i18next";
 
 function App() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const currentDirection = i18n.language === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = i18n.language;
+    document.documentElement.dir = currentDirection;
+    document.body.dir = currentDirection;
+  }, [i18n.language]);
+
   return (
     <>
       <ToastContainer position="top-center" />
-      <NavbarComponent />{" "}
-      {/*NavComponent will show up at all levels {Home page , Login page ... etc}*/}
+      <NavbarComponent />
       <Routes>
         <Route path="/" element={<HomePage />} />
 
@@ -41,7 +51,7 @@ function App() {
             </RouteProtection>
           }
         />
-        <Route path="/viewAll" element={<DiscoverDoctorsMap />} />{/* Reuse the current visible navbar path for the new Discover Doctors on Map page. */}
+        <Route path="/viewAll" element={<DiscoverDoctorsMap />} />
 
         <Route path="/entry" element={<AccountEntryContext />} />
         <Route

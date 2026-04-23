@@ -4,12 +4,7 @@ import img from "../../assets/imgs/globalIcon.png";
 import "../../GeneralStyles/buttonStyle.css";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-
-const navItems = [
-  { to: "/", label: "Home" },
-  { to: "/findDoctor", label: "Find Doctors" },
-  { to: "/viewAll", label: "Discover Doctors on Map" },
-];
+import { useTranslation } from "react-i18next";
 
 const getInitialTheme = () => {
   if (typeof window === "undefined") {
@@ -23,9 +18,16 @@ const getInitialTheme = () => {
 
 function NavbarComponent() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [theme, setTheme] = useState(getInitialTheme);
+
+  const navItems = [
+    { to: "/", label: t("nav.home") },
+    { to: "/findDoctor", label: t("nav.findDoctors") },
+    { to: "/viewAll", label: t("nav.discoverMap") },
+  ];
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -54,9 +56,14 @@ function NavbarComponent() {
     setIsMenuOpen(false);
   };
 
+  const handleLanguageChange = (language) => {
+    i18n.changeLanguage(language);
+    window.localStorage.setItem("medi-language", language);
+    setIsMenuOpen(false);
+  };
+
   const renderAuthActions = () => (
     <>
-      {/* <span className="navbar-language">EN</span> */}
       {isAuthenticated ? (
         <>
           <h4 className="navbar-user">
@@ -69,7 +76,7 @@ function NavbarComponent() {
             onClick={handleLogout}
             className="buttons buttons-secondary"
           >
-            Logout
+            {t("nav.logout")}
           </button>
         </>
       ) : (
@@ -79,14 +86,14 @@ function NavbarComponent() {
             className="nav-login-link"
             onClick={handleMenuClose}
           >
-            Login
+            {t("nav.login")}
           </Link>
           <Link
             to="/register"
             className="buttons buttons-primary"
             onClick={handleMenuClose}
           >
-            Sign Up
+            {t("nav.signUp")}
           </Link>
         </>
       )}
@@ -96,7 +103,7 @@ function NavbarComponent() {
   return (
     <nav className="site-nav">
       <div className="navbar">
-        <Link to="/" className="navbar-brand" aria-label="MediConnect home">
+        <Link to="/" className="navbar-brand" aria-label={t("nav.brandHome")}>
           <span className="navbar-logo-shell">
             <img src={img} alt="" className="navbar-logo" />
           </span>
@@ -112,12 +119,33 @@ function NavbarComponent() {
         </ul>
 
         <div className="navbar-actions">
+          <div className="navbar-language-switch" aria-label="Language switch">
+            <button
+              type="button"
+              className={`navbar-language-button ${
+                i18n.language === "en" ? "is-active" : ""
+              }`}
+              onClick={() => handleLanguageChange("en")}
+            >
+              {t("nav.english")}
+            </button>
+            <button
+              type="button"
+              className={`navbar-language-button ${
+                i18n.language === "ar" ? "is-active" : ""
+              }`}
+              onClick={() => handleLanguageChange("ar")}
+            >
+              {t("nav.arabic")}
+            </button>
+          </div>
+
           <button
             type="button"
             className="navbar-theme-toggle"
             onClick={handleThemeToggle}
           >
-            {theme === "dark" ? "Light mode" : "Dark mode"}
+            {theme === "dark" ? t("nav.lightMode") : t("nav.darkMode")}
           </button>
 
           <section className="section-log navbar-desktop-actions">
@@ -130,7 +158,7 @@ function NavbarComponent() {
             onClick={handleMenuToggle}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation"
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
           >
             <span className="navbar-menu-icon">
               <span />
@@ -156,6 +184,26 @@ function NavbarComponent() {
         </ul>
 
         <section className="section-log navbar-mobile-auth">
+          <div className="navbar-mobile-language-switch">
+            <button
+              type="button"
+              className={`navbar-language-button ${
+                i18n.language === "en" ? "is-active" : ""
+              }`}
+              onClick={() => handleLanguageChange("en")}
+            >
+              {t("nav.english")}
+            </button>
+            <button
+              type="button"
+              className={`navbar-language-button ${
+                i18n.language === "ar" ? "is-active" : ""
+              }`}
+              onClick={() => handleLanguageChange("ar")}
+            >
+              {t("nav.arabic")}
+            </button>
+          </div>
           {renderAuthActions()}
         </section>
       </div>

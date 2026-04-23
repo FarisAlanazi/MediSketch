@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../Auth/LoginLogic";
+import { useTranslation } from "react-i18next";
 import "../Profile_Style/profilePages.css";
 
 const createEmptyAvailabilityForm = () => ({
@@ -9,6 +10,7 @@ const createEmptyAvailabilityForm = () => ({
 });
 
 function DrDashboard() {
+  const { t } = useTranslation();
   const [availabilityForm, setAvailabilityForm] = useState(
     createEmptyAvailabilityForm(),
   );
@@ -37,7 +39,7 @@ function DrDashboard() {
         return;
       }
 
-      setLoadError("Unable to load available times right now.");
+      setLoadError(t("dashboard.loadError"));
     } finally {
       if (canUpdate()) {
         setIsLoading(false);
@@ -52,7 +54,7 @@ function DrDashboard() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -66,7 +68,7 @@ function DrDashboard() {
     event.preventDefault();
 
     if (!availabilityForm.date || !availabilityForm.time) {
-      toast.error("Please select both a date and time.");
+      toast.error(t("dashboard.emptyDateTime"));
       return;
     }
 
@@ -80,10 +82,10 @@ function DrDashboard() {
       });
 
       setAvailabilityForm(createEmptyAvailabilityForm());
-      toast.success("Availability added successfully.");
+      toast.success(t("dashboard.addSuccess"));
       await loadAvailableTimes();
     } catch {
-      toast.error("Error adding availability.");
+      toast.error(t("dashboard.addError"));
     } finally {
       setIsSaving(false);
     }
@@ -92,25 +94,23 @@ function DrDashboard() {
   return (
     <section className="dashboard-page">
       <header className="dashboard-page-header">
-        <p>Dashboard</p>
-        <h1>Add available time</h1>
-        <span>
-          Use a simple date and time form to publish available appointments.
-        </span>
+        <p>{t("dashboard.label")}</p>
+        <h1>{t("dashboard.title")}</h1>
+        <span>{t("dashboard.subtitle")}</span>
       </header>
 
       <div className="dashboard-layout">
-        <form className="dashboard-card dashboard-form-grid" onSubmit={handleSubmit}>
+        <form
+          className="dashboard-card dashboard-form-grid"
+          onSubmit={handleSubmit}
+        >
           <div>
-            <h2>New available time</h2>
-            <p>
-              This uses the existing availability structure without adding a
-              complex scheduling system.
-            </p>
+            <h2>{t("dashboard.formTitle")}</h2>
+            <p>{t("dashboard.formSubtitle")}</p>
           </div>
 
           <label htmlFor="availability-date">
-            Date
+            {t("dashboard.date")}
             <input
               type="date"
               id="availability-date"
@@ -121,7 +121,7 @@ function DrDashboard() {
           </label>
 
           <label htmlFor="availability-time">
-            Time
+            {t("dashboard.time")}
             <input
               type="time"
               id="availability-time"
@@ -136,14 +136,16 @@ function DrDashboard() {
             className="dashboard-submit-button"
             disabled={isSaving}
           >
-            {isSaving ? "Saving..." : "Add Available Time"}
+            {isSaving ? t("dashboard.saving") : t("dashboard.add")}
           </button>
         </form>
 
         <div className="dashboard-card">
-          <h2>Existing available times</h2>
+          <h2>{t("dashboard.existingTitle")}</h2>
           {isLoading ? (
-            <div className="dashboard-empty-state">Loading available times...</div>
+            <div className="dashboard-empty-state">
+              {t("dashboard.loading")}
+            </div>
           ) : loadError ? (
             <div className="dashboard-empty-state">{loadError}</div>
           ) : availableTimes.length ? (
@@ -152,21 +154,21 @@ function DrDashboard() {
                 <article key={slot.id} className="dashboard-item">
                   <div className="dashboard-item-header">
                     <h2>
-                      {slot.date} at {slot.time}
+                      {slot.date} {t("dashboard.at")} {slot.time}
                     </h2>
                     <span className="dashboard-status-pill">
-                      {slot.status ? "Available" : "Booked"}
+                      {slot.status ? t("dashboard.available") : t("dashboard.booked")}
                     </span>
                   </div>
                   <p className="dashboard-item-meta">
-                    This time is currently listed in your doctor dashboard.
+                    {t("dashboard.listed")}
                   </p>
                 </article>
               ))}
             </div>
           ) : (
             <div className="dashboard-empty-state">
-              No available times have been added yet.
+              {t("dashboard.empty")}
             </div>
           )}
         </div>

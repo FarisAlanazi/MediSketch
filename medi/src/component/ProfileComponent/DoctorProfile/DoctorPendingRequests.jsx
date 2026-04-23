@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 import api, { getCSRFToken } from "../../../Auth/LoginLogic";
+import { useTranslation } from "react-i18next";
 import "../Profile_Style/profilePages.css";
 
-const getPatientName = (appointment) => {
-  const fullName =
-    `${appointment?.patient?.user?.first_name ?? ""} ${
-      appointment?.patient?.user?.last_name ?? ""
-    }`.trim();
+const getPatientName = (appointment, t) => {
+  const fullName = `${appointment?.patient?.user?.first_name ?? ""} ${
+    appointment?.patient?.user?.last_name ?? ""
+  }`.trim();
 
-  return fullName || appointment?.patient?.user?.username || "Patient";
+  return fullName || appointment?.patient?.user?.username || t("records.patientFallback");
 };
 
-const normalizeStatus = (status) => String(status ?? "").trim().toLowerCase();
+const normalizeStatus = (status) =>
+  String(status ?? "")
+    .trim()
+    .toLowerCase();
 
 function DoctorPendingRequests() {
+  const { t } = useTranslation();
   const [requests, setRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -34,14 +38,16 @@ function DoctorPendingRequests() {
           return;
         }
 
-        const pendingRequests = (Array.isArray(response.data) ? response.data : []).filter(
+        const pendingRequests = (
+          Array.isArray(response.data) ? response.data : []
+        ).filter(
           (appointment) => normalizeStatus(appointment?.status) === "pending",
         );
 
         setRequests(pendingRequests);
       } catch {
         if (isMounted) {
-          setLoadError("Unable to load requests right now.");
+          setLoadError(t("records.requestsError"));
         }
       } finally {
         if (isMounted) {
@@ -55,7 +61,7 @@ function DoctorPendingRequests() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   const handleApprove = async (requestId) => {
     setApprovingId(requestId);
@@ -71,7 +77,7 @@ function DoctorPendingRequests() {
         currentRequests.filter((request) => request.id !== requestId),
       );
     } catch {
-      setActionError("Unable to approve this request right now.");
+      setActionError(t("records.requestsError"));
     } finally {
       setApprovingId(null);
     }
@@ -80,14 +86,14 @@ function DoctorPendingRequests() {
   return (
     <section className="profile-record-page">
       <header className="record-page-header">
-        <p>Requests</p>
-        <h1>Patient requests</h1>
-        <span>Pending booking requests appear here so they are easy to scan.</span>
+        <p>{t("records.requestsLabel")}</p>
+        <h1>{t("records.requestsTitle")}</h1>
+        <span>{t("records.requestsSubtitle")}</span>
       </header>
 
       <div className="record-card">
         {isLoading ? (
-          <div className="record-empty-state">Loading requests...</div>
+          <div className="record-empty-state">{t("records.loadingRequests")}</div>
         ) : loadError ? (
           <div className="record-empty-state">{loadError}</div>
         ) : requests.length ? (
@@ -101,26 +107,32 @@ function DoctorPendingRequests() {
                 <article key={request.id} className="record-item">
                   <div className="record-item-header">
                     <div>
-                      <h2>{getPatientName(request)}</h2>
-                      <p className="record-item-meta">
-                        {request?.patient?.user?.phone_number ||
+                      <h2>{getPatientName(request, t)}</h2>
+                    <p className="record-item-meta">
+                      {request?.patient?.user?.phone_number ||
                           request?.patient?.user?.email ||
-                          "Patient account"}
+                          t("records.patientAccount")}
                       </p>
                     </div>
 
                     <span
                       className={`record-status-pill record-status-${normalizeStatus(request.status)}`}
                     >
-                      {request.status}
+                      {t(`status.${normalizeStatus(request.status)}`, {
+                        defaultValue: request.status,
+                      })}
                     </span>
                   </div>
 
                   <p className="record-item-meta">
-                    Request date: {request.date} | Time: {request.time}
+                    {t("records.requestDateTime", {
+                      date: request.date,
+                      time: request.time,
+                    })}
                   </p>
+
                   <p className="record-item-note">
-                    Appointment request waiting for the next action.
+                    {t("records.requestWaiting")}
                   </p>
 
                   {normalizeStatus(request.status) === "pending" ? (
@@ -131,7 +143,9 @@ function DoctorPendingRequests() {
                         onClick={() => handleApprove(request.id)}
                         disabled={approvingId === request.id}
                       >
-                        {approvingId === request.id ? "Approving..." : "Approve"}
+                        {approvingId === request.id
+                          ? t("records.approving")
+                          : t("records.approve")}
                       </button>
                     </div>
                   ) : null}
@@ -141,7 +155,7 @@ function DoctorPendingRequests() {
           </>
         ) : (
           <div className="record-empty-state">
-            No pending requests are waiting right now.
+            {t("records.noRequests")}
           </div>
         )}
       </div>
