@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import api from "../../../Auth/LoginLogic";
 import { useAuth } from "../../../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import { isAcceptedAppointmentStatus } from "../../../utils/appointmentStatus";
 import "./detailsStyles/reviews.css";
 
 const getErrorMessage = (error, fallbackMessage) => {
@@ -63,12 +64,12 @@ function Reviews({
   ); // Build a simple list of already-reviewed appointment ids so the same appointment cannot be reviewed twice.
   const eligibleAppointments = doctorAppointments.filter(
     (appointment) =>
-      String(appointment?.status ?? "").toLowerCase() !== "declined" &&
+      isAcceptedAppointmentStatus(appointment?.status) &&
       !reviewedAppointmentIds.includes(String(appointment.id)),
-  ); // Keep only appointments that are not declined and not already reviewed because each appointment gets one review chance.
-  const hasNonDeclinedAppointments = doctorAppointments.some(
-    (appointment) => String(appointment?.status ?? "").toLowerCase() !== "declined",
-  ); // Check whether the patient has at least one appointment that is still review-eligible by status.
+  ); // Keep only accepted appointments that are not already reviewed because the frontend rating flow must depend on acceptance.
+  const hasAcceptedAppointments = doctorAppointments.some((appointment) =>
+    isAcceptedAppointmentStatus(appointment?.status),
+  ); // Check whether the patient has any accepted appointment with this doctor before showing the review form state.
 
   const handleChange = (event) => {
     setFeedbackForm((currentForm) => ({
@@ -116,9 +117,9 @@ function Reviews({
           );
         const firstEligibleAppointment = matchedAppointments.find(
           (appointment) =>
-            String(appointment?.status ?? "").toLowerCase() !== "declined" &&
+            isAcceptedAppointmentStatus(appointment?.status) &&
             !reviewedAppointmentIds.includes(String(appointment.id)),
-        ); // Read the first reviewable appointment once so the code stays simple and avoids repeated search work.
+        ); // Read the first accepted reviewable appointment once so the code stays simple and avoids repeated search work.
 
         setDoctorAppointments(matchedAppointments);
         setFeedbackForm((currentForm) => ({
@@ -206,10 +207,7 @@ function Reviews({
       toast.success(t("reviews.successToast"));
       onRefresh?.();
     } catch (error) {
-      const safeMessage = getErrorMessage(
-        error,
-        t("reviews.submitError"),
-      );
+      const safeMessage = getErrorMessage(error, t("reviews.submitError"));
 
       setFormStatus({ type: "error", text: safeMessage });
       toast.error(safeMessage);
@@ -233,9 +231,7 @@ function Reviews({
       </div>
 
       {!isAuthenticated ? (
-        <p className="feedback-auth-note">
-          {t("reviews.loginNote")}
-        </p>
+        <p className="feedback-auth-note">{t("reviews.loginNote")}</p>
       ) : user?.user_type !== "patient" ? (
         <p className="feedback-auth-note">{t("reviews.patientOnly")}</p>
       ) : appointmentsLoading ? (
@@ -303,8 +299,10 @@ function Reviews({
             {isSubmitting ? t("reviews.submitting") : t("reviews.submit")}
           </button>
         </form>
-      ) : doctorAppointments.length && hasNonDeclinedAppointments ? (
+      ) : doctorAppointments.length && hasAcceptedAppointments ? (
         <p className="feedback-auth-note">{t("reviews.allReviewed")}</p>
+      ) : doctorAppointments.length ? (
+        <p className="feedback-auth-note">{t("reviews.acceptedOnly")}</p>
       ) : (
         <p className="feedback-auth-note">{t("reviews.bookFirst")}</p>
       )}
@@ -335,7 +333,9 @@ function Reviews({
           ))}
         </div>
       ) : (
-        <div className="reviewsState">{t("doctorDetails.noRatingsOrComments")}</div>
+        <div className="reviewsState">
+          {t("doctorDetails.noRatingsOrComments")}
+        </div>
       )}
     </section>
   );

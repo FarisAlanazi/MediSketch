@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../../Auth/LoginLogic";
 import { useTranslation } from "react-i18next";
+import {
+  acceptClinicRequest,
+  getClinicErrorMessage,
+  getDoctorClinicRequests,
+  rejectClinicRequest,
+} from "../../../Components/clinic/clinicApi";
+import {
+  getClinicRequestClinicName,
+  normalizeClinicRequestStatus,
+} from "../../../utils/clinicRequestHelpers";
 import "../Profile_Style/profilePages.css";
 
 const createEmptyAvailabilityForm = () => ({
@@ -15,9 +25,15 @@ function DrDashboard() {
     createEmptyAvailabilityForm(),
   );
   const [availableTimes, setAvailableTimes] = useState([]);
+  const [clinicRequests, setClinicRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingClinicRequests, setIsLoadingClinicRequests] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [clinicRequestsError, setClinicRequestsError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [processingClinicRequestId, setProcessingClinicRequestId] =
+    useState(null);
+  const [processingClinicAction, setProcessingClinicAction] = useState("");
 
   const loadAvailableTimes = async (canUpdate = () => true) => {
     if (canUpdate()) {
@@ -47,9 +63,56 @@ function DrDashboard() {
     }
   };
 
+  const loadClinicRequests = async (canUpdate = () => true) => {
+    if (canUpdate()) {
+      setIsLoadingClinicRequests(true);
+      setClinicRequestsError("");
+    }
+
+    try {
+      const response = await getDoctorClinicRequests();
+
+      if (!canUpdate()) {
+        return;
+      }
+
+      // This keeps only pending clinic requests in the doctor dashboard section.
+      const pendingClinicRequests = (
+        Array.isArray(response) ? response : []
+      )
+        .filter((request) => {
+          const requestStatus = normalizeClinicRequestStatus(request?.status);
+          return !requestStatus || requestStatus === "pending";
+        })
+        .map((request) => ({
+          ...request,
+          clinicDisplayName: getClinicRequestClinicName(request),
+        }));
+
+      setClinicRequests(pendingClinicRequests);
+    } catch (error) {
+      if (!canUpdate()) {
+        return;
+      }
+
+      setClinicRequestsError(
+        error?.message ||
+          getClinicErrorMessage(
+            error,
+            "Unable to load clinic requests right now.",
+          ),
+      );
+    } finally {
+      if (canUpdate()) {
+        setIsLoadingClinicRequests(false);
+      }
+    }
+  };
+
   useEffect(() => {
-    let isMounted = true;
-    loadAvailableTimes(() => isMounted);
+    let isMounted = true; // canUpdate flag .
+    loadAvailableTimes(() => isMounted); //run the func and pass the isMounted func as a param to check if the component is still mounted before updating state
+    loadClinicRequests(() => isMounted);
 
     return () => {
       isMounted = false;
@@ -83,11 +146,43 @@ function DrDashboard() {
 
       setAvailabilityForm(createEmptyAvailabilityForm());
       toast.success(t("dashboard.addSuccess"));
-      await loadAvailableTimes();
+      await loadAvailableTimes(); // get availability again to update the list with the new entry
     } catch {
       toast.error(t("dashboard.addError"));
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleClinicRequestAction = async (requestId, actionType) => {
+    setProcessingClinicRequestId(requestId);
+    setProcessingClinicAction(actionType);
+
+    try {
+      if (actionType === "accept") {
+        await acceptClinicRequest(requestId);
+        toast.success("Clinic request accepted.");
+      } else {
+        await rejectClinicRequest(requestId);
+        toast.success("Clinic request rejected.");
+      }
+
+      // This removes the handled request so the pending list updates without reloading the whole dashboard.
+      setClinicRequests((currentRequests) =>
+        currentRequests.filter((request) => request.id !== requestId),
+      );
+    } catch (error) {
+      toast.error(
+        getClinicErrorMessage(
+          error,
+          actionType === "accept"
+            ? "Unable to accept clinic request."
+            : "Unable to reject clinic request.",
+        ),
+      );
+    } finally {
+      setProcessingClinicRequestId(null);
+      setProcessingClinicAction("");
     }
   };
 
@@ -157,21 +252,84 @@ function DrDashboard() {
                       {slot.date} {t("dashboard.at")} {slot.time}
                     </h2>
                     <span className="dashboard-status-pill">
-                      {slot.status ? t("dashboard.available") : t("dashboard.booked")}
+                      {slot.status
+                        ? t("dashboard.available")
+                        : t("dashboard.booked")}
                     </span>
                   </div>
-                  <p className="dashboard-item-meta">
-                    {t("dashboard.listed")}
-                  </p>
+                  <p className="dashboard-item-meta">{t("dashboard.listed")}</p>
                 </article>
               ))}
             </div>
           ) : (
-            <div className="dashboard-empty-state">
-              {t("dashboard.empty")}
-            </div>
+            <div className="dashboard-empty-state">{t("dashboard.empty")}</div>
           )}
         </div>
+      </div>
+
+      <div className="dashboard-card" style={{ marginTop: "1.25rem" }}>
+        <h2>Clinic Requests</h2>
+        <p>Pending clinic requests appear here.</p>
+
+        {isLoadingClinicRequests ? (
+          <div className="dashboard-empty-state">
+            Loading clinic requests...
+          </div>
+        ) : clinicRequestsError ? (
+          <div className="dashboard-empty-state">{clinicRequestsError}</div>
+        ) : clinicRequests.length ? (
+          <div className="dashboard-list">
+            {clinicRequests.map((request) => (
+              <article key={request.id} className="dashboard-item">
+                <div className="dashboard-item-header">
+                  <div>
+                    <h2>{request.clinicDisplayName}</h2>
+                    {request?.clinic?.address || request?.address ? (
+                      <p className="dashboard-item-meta">
+                        {request?.clinic?.address || request?.address}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <span className="dashboard-status-pill">Pending</span>
+                </div>
+
+                <div className="record-item-actions">
+                  <button
+                    type="button"
+                    className="record-approve-button"
+                    onClick={() =>
+                      handleClinicRequestAction(request.id, "accept")
+                    }
+                    disabled={processingClinicRequestId === request.id}
+                  >
+                    {processingClinicRequestId === request.id &&
+                    processingClinicAction === "accept"
+                      ? "Accepting..."
+                      : "Accept"}
+                  </button>
+                  <button
+                    type="button"
+                    className="record-reject-button"
+                    onClick={() =>
+                      handleClinicRequestAction(request.id, "reject")
+                    }
+                    disabled={processingClinicRequestId === request.id}
+                  >
+                    {processingClinicRequestId === request.id &&
+                    processingClinicAction === "reject"
+                      ? "Rejecting..."
+                      : "Reject"}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="dashboard-empty-state">
+            No clinic requests are waiting right now.
+          </div>
+        )}
       </div>
     </section>
   );

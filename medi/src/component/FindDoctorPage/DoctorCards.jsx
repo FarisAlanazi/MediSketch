@@ -19,9 +19,9 @@ export default function DoctorCards({
   gender,
   experience,
   rating,
-  clinic,
+  city,
+  clinicName,
   availableDays = [],
-  detailsId,
   id,
 }) {
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ export default function DoctorCards({
           {hasRating ? `★ ${rating.toFixed(1)}` : t("doctors.noRatings")}
         </p>
         <p className="doctor-price-badge">
-          {hasPrice ? `$${price}` : t("doctors.priceUnavailable")}
+          {hasPrice ? <h5> ⃁{price}</h5> : t("doctors.priceUnavailable")}
         </p>
       </div>
 
@@ -66,8 +66,13 @@ export default function DoctorCards({
           </h2>
 
           <p className="doctor-location">
-            {clinic || t("doctors.locationNotListed")}
+            {city || t("doctors.locationNotListed")}
           </p>
+
+          {/* This shows the clinic name only when the backend already provides one. */}
+          {clinicName ? (
+            <p className="doctor-location">Clinic: {clinicName}</p>
+          ) : null}
 
           <div className="doctor-card-meta">
             {hasExperience ? (
@@ -102,10 +107,7 @@ export default function DoctorCards({
           ) : null}
 
           <div className="doctor-card-actions">
-            <Link
-              to={`/DoctorDetails/${detailsId ?? id}`}
-              className="doctor-view-button"
-            >
+            <Link to={`/DoctorDetails/${id}`} className="doctor-view-button">
               {t("doctors.viewProfile")}
             </Link>
           </div>

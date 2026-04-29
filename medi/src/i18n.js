@@ -68,6 +68,8 @@ const resources = {
         accountCreated: "Your account has been created",
         registrationError: "Failed to register",
         genericError: "Something went wrong",
+        fillAllFields:
+          "Some filds are not filled out correctly. Please check and try again.",
       },
       doctors: {
         pageLabel: "Find Doctors",
@@ -93,7 +95,8 @@ const resources = {
         rating45: "4.5+",
         rating48: "4.8+",
         noMatchTitle: "No doctors match the current filters.",
-        noMatchBody: "Try clearing one or more filters to see more specialists.",
+        noMatchBody:
+          "Try clearing one or more filters to see more specialists.",
         noRatings: "No ratings yet",
         priceUnavailable: "Price unavailable",
         locationNotListed: "Location not listed",
@@ -180,10 +183,12 @@ const resources = {
       },
       homeCards: {
         yearsExperience: "{{count}} years experience",
+        noRating: "No ratings yet",
         bookNow: "Book Now",
       },
       doctorDetails: {
-        loadToastError: "Unable to load doctor details. Please try again later.",
+        loadToastError:
+          "Unable to load doctor details. Please try again later.",
         reviewFallbackComment: "No written comment was provided.",
         anonymousReviewer: "Anonymous reviewer",
         dateUnavailable: "Date unavailable",
@@ -234,7 +239,8 @@ const resources = {
       reviews: {
         label: "Feedback",
         title: "Ratings and comments",
-        loginNote: "Log in with a patient account to leave feedback for this doctor.",
+        loginNote:
+          "Log in with a patient account to leave feedback for this doctor.",
         patientOnly: "Only patient accounts can submit feedback.",
         loadingAppointments: "Loading your appointments for this doctor...",
         appointmentsError: "Unable to load your appointments for feedback.",
@@ -250,8 +256,12 @@ const resources = {
         successToast: "Feedback submitted successfully!",
         submitting: "Submitting...",
         submit: "Submit Feedback",
-        allReviewed: "Every appointment with this doctor has already been reviewed.",
-        bookFirst: "Book an appointment with this doctor before leaving feedback.",
+        allReviewed:
+          "Every appointment with this doctor has already been reviewed.",
+        acceptedOnly:
+          "Only accepted appointments can be reviewed for this doctor.",
+        bookFirst:
+          "Book an appointment with this doctor before leaving feedback.",
         loadingReviews: "Loading reviews...",
         loadReviewsError: "Unable to load reviews right now.",
         poor: "Poor",
@@ -270,29 +280,37 @@ const resources = {
         clinicNotListed: "Clinic location not listed.",
         appointmentsLabel: "Appointments",
         appointmentsTitle: "My appointments",
-        appointmentsSubtitle: "Review your doctor bookings in a simple readable list.",
+        appointmentsSubtitle:
+          "Review your doctor bookings in a simple readable list.",
         loadingAppointments: "Loading appointments...",
         appointmentsError: "Unable to load appointments right now.",
         noAppointments: "You do not have any appointments yet.",
         dateTime: "Date: {{date}} | Time: {{time}}",
         pendingLabel: "Pending",
         pendingTitle: "Pending appointment requests",
-        pendingSubtitle: "See the requests that are still waiting for confirmation.",
+        pendingSubtitle:
+          "See the requests that are still waiting for confirmation.",
         loadingPending: "Loading pending requests...",
         pendingError: "Unable to load pending requests right now.",
         pendingWaiting: "This request has not been accepted or declined yet.",
         noPending: "No pending appointment requests are waiting right now.",
         requestDateTime: "Request date: {{date}} | Time: {{time}}",
         doctorAppointmentsTitle: "Doctor appointments",
-        doctorAppointmentsSubtitle: "See the bookings linked to your account in one simple list.",
+        doctorAppointmentsSubtitle:
+          "See the bookings linked to your account in one simple list.",
         approveError: "Unable to approve this appointment right now.",
-        realBookingRequest: "This appointment came from a real booking request.",
+        rejectError: "Unable to reject this appointment right now.",
+        realBookingRequest:
+          "This appointment came from a real booking request.",
         approving: "Approving...",
         approve: "Approve",
+        rejecting: "Rejecting...",
+        reject: "Reject",
         noDoctorAppointments: "No appointments have been booked yet.",
         requestsLabel: "Requests",
         requestsTitle: "Patient requests",
-        requestsSubtitle: "Pending booking requests appear here so they are easy to scan.",
+        requestsSubtitle:
+          "Pending booking requests appear here so they are easy to scan.",
         loadingRequests: "Loading requests...",
         requestsError: "Unable to load requests right now.",
         requestWaiting: "Appointment request waiting for the next action.",
@@ -301,7 +319,8 @@ const resources = {
       dashboard: {
         label: "Dashboard",
         title: "Add available time",
-        subtitle: "Use a simple date and time form to publish available appointments.",
+        subtitle:
+          "Use a simple date and time form to publish available appointments.",
         emptyDateTime: "Please select both a date and time.",
         addSuccess: "Availability added successfully.",
         addError: "Error adding availability.",
@@ -324,6 +343,7 @@ const resources = {
       status: {
         pending: "Pending",
         accepted: "Accepted",
+        rejected: "Rejected",
         declined: "Declined",
       },
       locationCard: {
@@ -395,6 +415,8 @@ const resources = {
         accountCreated: "تم إنشاء حسابك بنجاح",
         registrationError: "فشل إنشاء الحساب",
         genericError: "حدث خطأ ما",
+        fillAllFields:
+          "بعض الحقول غير ممتلئة بشكل صحيح. يرجى التحقق والمحاولة مرة أخرى.",
       },
       doctors: {
         pageLabel: "ابحث عن الأطباء",
@@ -432,7 +454,8 @@ const resources = {
         loadError: "تعذر تحميل الأطباء على الخريطة حالياً.",
         label: "اكتشف الأطباء",
         title: "اكتشف الأطباء على الخريطة",
-        subtitle: "تصفح الأطباء على الخريطة وافتح ملف أي طبيب بالضغط على العلامة.",
+        subtitle:
+          "تصفح الأطباء على الخريطة وافتح ملف أي طبيب بالضغط على العلامة.",
         results: "{{count}} طبيب لديهم مواقع محفوظة على الخريطة",
         emptyTitle: "لا توجد مواقع أطباء متاحة حالياً.",
         emptyBody: "سيظهر الأطباء هنا بعد حفظ موقع العيادة.",
@@ -453,7 +476,8 @@ const resources = {
         loading: "جارٍ تحميل ملف المريض...",
         pageLabel: "ملف المريض",
         pageTitle: "حافظ على بيانات حسابك واضحة ومحدثة",
-        pageSubtitle: "تجعل هذه الصفحة معلوماتك الشخصية بسيطة وواضحة وسهلة التحديث.",
+        pageSubtitle:
+          "تجعل هذه الصفحة معلوماتك الشخصية بسيطة وواضحة وسهلة التحديث.",
         sectionTitle: "المعلومات الشخصية",
         firstName: "الاسم الأول",
         lastName: "اسم العائلة",
@@ -474,7 +498,8 @@ const resources = {
         loading: "جارٍ تحميل ملف الطبيب...",
         pageLabel: "ملف الطبيب",
         pageTitle: "عدّل ملفك المهني",
-        pageSubtitle: "حافظ على بياناتك الشخصية وموقع العيادة ومعلوماتك المهنية محدثة.",
+        pageSubtitle:
+          "حافظ على بياناتك الشخصية وموقع العيادة ومعلوماتك المهنية محدثة.",
         basicInfo: "المعلومات الأساسية",
         professionalDetails: "التفاصيل المهنية",
         clinicLocation: "موقع العيادة",
@@ -504,6 +529,7 @@ const resources = {
       },
       homeCards: {
         yearsExperience: "{{count}} سنة خبرة",
+        noRating: "لا توجد تقييمات ",
         bookNow: "احجز الآن",
       },
       doctorDetails: {
@@ -538,7 +564,8 @@ const resources = {
         label: "الحجز",
         title: "احجز موعداً",
         subtitle: "اختر أحد المواعيد المتاحة للطبيب وأرسل طلب موعد حقيقي.",
-        loginNote: "سجل الدخول بحساب مريض لرؤية الأوقات المتاحة وحجز هذا الطبيب.",
+        loginNote:
+          "سجل الدخول بحساب مريض لرؤية الأوقات المتاحة وحجز هذا الطبيب.",
         patientOnly: "فقط حسابات المرضى يمكنها حجز المواعيد.",
         loading: "جارٍ تحميل الأوقات المتاحة...",
         loadError: "تعذر تحميل الأوقات المتاحة حالياً.",
@@ -573,6 +600,7 @@ const resources = {
         submitting: "جارٍ الإرسال...",
         submit: "إرسال التقييم",
         allReviewed: "تمت مراجعة كل المواعيد مع هذا الطبيب بالفعل.",
+        acceptedOnly: "يمكن تقييم هذا الطبيب فقط بعد موعد تم قبوله.",
         bookFirst: "احجز موعداً مع هذا الطبيب قبل إضافة تقييم.",
         loadingReviews: "جارٍ تحميل التقييمات...",
         loadReviewsError: "تعذر تحميل التقييمات حالياً.",
@@ -606,11 +634,15 @@ const resources = {
         noPending: "لا توجد طلبات مواعيد معلقة حالياً.",
         requestDateTime: "تاريخ الطلب: {{date}} | الوقت: {{time}}",
         doctorAppointmentsTitle: "مواعيد الطبيب",
-        doctorAppointmentsSubtitle: "اعرض الحجوزات المرتبطة بحسابك في قائمة واحدة بسيطة.",
+        doctorAppointmentsSubtitle:
+          "اعرض الحجوزات المرتبطة بحسابك في قائمة واحدة بسيطة.",
         approveError: "تعذر الموافقة على هذا الموعد حالياً.",
+        rejectError: "تعذر رفض هذا الموعد حالياً.",
         realBookingRequest: "جاء هذا الموعد من طلب حجز حقيقي.",
         approving: "جارٍ الموافقة...",
         approve: "موافقة",
+        rejecting: "جارٍ الرفض...",
+        reject: "رفض",
         noDoctorAppointments: "لم يتم حجز أي مواعيد بعد.",
         requestsLabel: "الطلبات",
         requestsTitle: "طلبات المرضى",
@@ -628,7 +660,8 @@ const resources = {
         addSuccess: "تمت إضافة الوقت المتاح بنجاح.",
         addError: "حدث خطأ أثناء إضافة الوقت المتاح.",
         formTitle: "وقت متاح جديد",
-        formSubtitle: "يستخدم هذا نفس بنية التوفر الحالية بدون إضافة نظام جدولة معقد.",
+        formSubtitle:
+          "يستخدم هذا نفس بنية التوفر الحالية بدون إضافة نظام جدولة معقد.",
         date: "التاريخ",
         time: "الوقت",
         saving: "جارٍ الحفظ...",
@@ -645,6 +678,7 @@ const resources = {
       status: {
         pending: "قيد الانتظار",
         accepted: "مقبول",
+        rejected: "مرفوض",
         declined: "مرفوض",
       },
       locationCard: {

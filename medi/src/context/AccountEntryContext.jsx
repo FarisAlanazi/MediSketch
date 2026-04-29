@@ -11,6 +11,9 @@ function AccountEntryContext() {
   if (user.user_type === "doctor") {
     return <Navigate to="/doctor/profile" replace />;
   }
+  if (user.user_type === "clinic") {
+    return <Navigate to="/clinic/" replace />;
+  }
 
   return <Navigate to="/account/profile" replace />;
 }

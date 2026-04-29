@@ -21,6 +21,7 @@ import DoctorDash from "./component/ProfileComponent/DoctorProfile/DrDashboard";
 import DoctorDetails from "./component/FindDoctorPage/DoctorDetailsPage/DoctorDetails";
 import DiscoverDoctorsMap from "./Pages/DiscoverDoctorsMap";
 import { useTranslation } from "react-i18next";
+import Clinicpage from "./Pages/Clinicpage";
 
 function App() {
   const { i18n } = useTranslation();
@@ -131,6 +132,27 @@ function App() {
           />
         </Route>
         <Route path="DoctorDetails/:id" element={<DoctorDetails />} />
+
+        <Route path="clinic" element={<Clinicpage />} />
+
+        <Route
+          path="*"
+          element={
+            <div
+              style={{
+                textAlign: "center",
+                fontSize: "3rem",
+                display: "flex",
+                alignContent: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+                height: "80vh",
+              }}
+            >
+              404 Not Found
+            </div>
+          }
+        />
       </Routes>
     </>
   );

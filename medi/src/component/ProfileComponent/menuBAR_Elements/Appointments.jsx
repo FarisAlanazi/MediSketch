@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../../Auth/LoginLogic";
 import { useTranslation } from "react-i18next";
+import { getAppointmentStatusTranslationKey } from "../../../utils/appointmentStatus";
 import "../Profile_Style/profilePages.css";
 
 const getDoctorName = (appointment, t) => {
@@ -79,9 +80,9 @@ function Appointments() {
                   </div>
 
                   <span
-                    className={`record-status-pill record-status-${appointment.status}`}
+                    className={`record-status-pill record-status-${getAppointmentStatusTranslationKey(appointment.status)}`}
                   >
-                    {t(`status.${String(appointment.status ?? "").toLowerCase()}`, {
+                    {t(`status.${getAppointmentStatusTranslationKey(appointment.status)}`, {
                       defaultValue: appointment.status,
                     })}
                   </span>

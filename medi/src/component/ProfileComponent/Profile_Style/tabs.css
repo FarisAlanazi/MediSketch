@@ -7,8 +7,8 @@
 }
 
 .profile-tabs-shell {
-  width: min(1120px, calc(100% - 24px));
-  margin: 2rem auto 0;
+  width: min(1160px, calc(100% - 24px));
+  margin: 3rem auto 0;
   padding: 1rem;
   background: var(--surfaceColor);
   border: 1px solid var(--borderColor);

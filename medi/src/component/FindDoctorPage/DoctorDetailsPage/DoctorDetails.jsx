@@ -29,9 +29,7 @@ const getDoctorLocation = (doctor) =>
   "";
 
 const getDoctorBio = (doctor) =>
-  doctor?.about_me?.trim?.() ||
-  doctor?.about_me ||
-  "";
+  doctor?.about_me?.trim?.() || doctor?.about_me || "";
 
 const extractFeedbackDoctorKeys = (feedback) =>
   [
@@ -101,7 +99,9 @@ async function fetchDoctorDetails(routeId, t) {
     return detailResponse.data;
   } catch (err) {
     const listResponse = await api.get("/doctors/");
-    const matchedDoctor = (Array.isArray(listResponse.data) ? listResponse.data : []).find(
+    const matchedDoctor = (
+      Array.isArray(listResponse.data) ? listResponse.data : []
+    ).find(
       (doctor) =>
         String(doctor?.id ?? "") === String(routeId) ||
         String(doctor?.user?.id ?? "") === String(routeId),
@@ -345,7 +345,10 @@ function DoctorDetails() {
 
                   <div className="doctor-summary-text">
                     <h2>{t("doctorDetails.about")}</h2>
-                    <p>{getDoctorBio(doctorDetails) || t("doctorDetails.bioFallback")}</p>
+                    <p>
+                      {getDoctorBio(doctorDetails) ||
+                        t("doctorDetails.bioFallback")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -360,7 +363,9 @@ function DoctorDetails() {
               />
 
               <article className="details-card rating-summary-card">
-                <p className="details-card-label">{t("doctorDetails.ratingSummary")}</p>
+                <p className="details-card-label">
+                  {t("doctorDetails.ratingSummary")}
+                </p>
                 <h2>
                   {ratingSummary.count
                     ? ratingSummary.average.toFixed(1)
@@ -370,7 +375,9 @@ function DoctorDetails() {
                   {ratingSummary.count ? "★★★★★" : t("doctorDetails.noRatings")}
                 </p>
                 <p className="rating-review-count">
-                  {t("doctorDetails.reviewsCount", { count: ratingSummary.count })}
+                  {t("doctorDetails.reviewsCount", {
+                    count: ratingSummary.count,
+                  })}
                 </p>
               </article>
             </div>

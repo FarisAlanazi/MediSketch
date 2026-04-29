@@ -40,6 +40,7 @@ const pickTextValue = (primaryValue, fallbackValue) =>
   toTextValue(primaryValue ?? fallbackValue);
 
 const getErrorMessage = (error, fallbackMessage) => {
+  //if there's an error from the backend then show it, otherwise show the fallback error
   if (typeof error?.response?.data?.detail === "string") {
     return error.response.data.detail;
   }
@@ -84,6 +85,7 @@ function DoctorProfile() {
         const meResponse = await api.get("/me/");
         const currentUser = meResponse.data;
         const [doctorResult, specializationsResult] = await Promise.allSettled([
+          //allSettled means wait until all finish. do not fail if one of them fails, and reutrn the result of each req.
           api.get(`/doctors/${currentUser.id}/`),
           api.get("/specializations/"),
         ]);
@@ -93,6 +95,7 @@ function DoctorProfile() {
         }
 
         if (doctorResult.status !== "fulfilled") {
+          //promise request , if fulfilled or rejected, allSettled wont send error and i have to check on the status manually.
           throw doctorResult.reason;
         }
 
@@ -101,27 +104,35 @@ function DoctorProfile() {
           specializationsResult.status === "fulfilled" &&
           Array.isArray(specializationsResult.value.data)
             ? specializationsResult.value.data
-            : [];
+            : []; // if the request is good and the data is an array then use it, otherwise use empty array
+
         const visibleSpecializations =
           specializationOptions.length ||
           !currentUser.specialization ||
           !doctorResponse.specialization
             ? specializationOptions
             : [
+                //fallback , imagine the specialization dropdown failed to load data from the backend, then the fallback will show the doctor current specialization.
                 {
                   id: currentUser.specialization,
                   name: doctorResponse.specialization,
                 },
               ];
-        const matchedSpecialization =
+
+        const matchedSpecialization = //search to find the doctor specialization in the loaded options.
           visibleSpecializations.find(
             (specialization) =>
-              String(specialization.id) === String(currentUser.specialization) ||
+              String(specialization.id) ===
+                String(currentUser.specialization) ||
               specialization.name === doctorResponse.specialization,
           ) ?? null;
 
-        setSpecializations(visibleSpecializations);
+        setSpecializations(visibleSpecializations); // add the final visible specializations to the state to be used in the specialization dropdown.
+
+        //
+
         setDoctorForm({
+          //set the form with string values only to avoid un/controlled input errors.
           userId: toTextValue(currentUser.id),
           first_name: toTextValue(currentUser.first_name),
           last_name: toTextValue(currentUser.last_name),
@@ -136,7 +147,10 @@ function DoctorProfile() {
             doctorResponse.years_of_experience,
             currentUser.years_of_experience,
           ),
-          about_me: pickTextValue(doctorResponse.about_me, currentUser.about_me),
+          about_me: pickTextValue(
+            doctorResponse.about_me,
+            currentUser.about_me,
+          ),
           specialization: matchedSpecialization
             ? toTextValue(matchedSpecialization.id)
             : toTextValue(currentUser.specialization),
@@ -149,12 +163,7 @@ function DoctorProfile() {
           return;
         }
 
-        setLoadError(
-          getErrorMessage(
-            error,
-            t("doctorProfile.loadError"),
-          ),
-        );
+        setLoadError(getErrorMessage(error, t("doctorProfile.loadError")));
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -182,12 +191,13 @@ function DoctorProfile() {
     await getCSRFToken();
 
     try {
+      //in this post req, the numerical values will be converted to numbers or null using toNullableNumber func.
       await api.patch("/me/", {
         first_name: doctorForm.first_name,
         last_name: doctorForm.last_name,
         email: doctorForm.email,
         phone_number: doctorForm.phone_number,
-        age: toNullableNumber(doctorForm.age),
+        age: toNullableNumber(doctorForm.age), //number or null
         gender: doctorForm.gender || null,
         price: toNullableNumber(doctorForm.price),
         about_me: doctorForm.about_me,
@@ -205,9 +215,7 @@ function DoctorProfile() {
 
       toast.success(t("doctorProfile.success"));
     } catch (error) {
-      toast.error(
-        getErrorMessage(error, t("doctorProfile.saveError")),
-      );
+      toast.error(getErrorMessage(error, t("doctorProfile.saveError")));
     } finally {
       setIsSaving(false);
     }
@@ -244,9 +252,14 @@ function DoctorProfile() {
         <span>{t("doctorProfile.pageSubtitle")}</span>
       </header>
 
-      <form className="profile-card profile-form-layout" onSubmit={handleSubmission}>
+      <form
+        className="profile-card profile-form-layout"
+        onSubmit={handleSubmission}
+      >
         <section>
-          <h2 className="profile-section-title">{t("doctorProfile.basicInfo")}</h2>
+          <h2 className="profile-section-title">
+            {t("doctorProfile.basicInfo")}
+          </h2>
           <div className="profile-form-grid">
             <div className="profile-field">
               <label htmlFor="first_name">{t("doctorProfile.firstName")}</label>
@@ -325,7 +338,9 @@ function DoctorProfile() {
           </h2>
           <div className="profile-form-grid">
             <div className="profile-field">
-              <label htmlFor="price">{t("doctorProfile.consultationPrice")}</label>
+              <label htmlFor="price">
+                {t("doctorProfile.consultationPrice")}
+              </label>
               <input
                 type="number"
                 name="price"
@@ -349,14 +364,18 @@ function DoctorProfile() {
             </div>
 
             <div className="profile-field">
-              <label htmlFor="specialization">{t("doctorProfile.specialization")}</label>
+              <label htmlFor="specialization">
+                {t("doctorProfile.specialization")}
+              </label>
               <select
                 name="specialization"
                 id="specialization"
                 value={doctorForm.specialization}
                 onChange={handleChange}
               >
-                <option value="">{t("doctorProfile.selectSpecialization")}</option>
+                <option value="">
+                  {t("doctorProfile.selectSpecialization")}
+                </option>
                 {specializations.map((specialization) => (
                   <option key={specialization.id} value={specialization.id}>
                     {specialization.name}
@@ -391,7 +410,11 @@ function DoctorProfile() {
                 value={doctorForm.medical_id}
                 onChange={handleChange}
                 onBlur={() => setMedicalIdTouched(true)}
-                className={medicalIdTouched && isMedicalIdInvalid ? "profile-input-invalid" : ""}
+                className={
+                  medicalIdTouched && isMedicalIdInvalid
+                    ? "profile-input-invalid"
+                    : ""
+                }
               />
               {medicalIdTouched && isMedicalIdInvalid ? (
                 <span className="profile-field-error">
@@ -424,7 +447,9 @@ function DoctorProfile() {
         </section>
 
         <section>
-          <h2 className="profile-section-title">{t("doctorProfile.clinicLocation")}</h2>
+          <h2 className="profile-section-title">
+            {t("doctorProfile.clinicLocation")}
+          </h2>
           <DoctorLocationPicker
             latitude={doctorForm.latitude}
             longitude={doctorForm.longitude}

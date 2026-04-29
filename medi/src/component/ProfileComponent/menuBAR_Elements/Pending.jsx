@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../../../Auth/LoginLogic";
 import { useTranslation } from "react-i18next";
+import { getAppointmentStatusTranslationKey } from "../../../utils/appointmentStatus";
 import "../Profile_Style/profilePages.css";
 
 const getDoctorName = (appointment, t) => {
-  const fullName =
-    `${appointment?.doctor?.user?.first_name ?? ""} ${
-      appointment?.doctor?.user?.last_name ?? ""
-    }`.trim();
+  const fullName = `${appointment?.doctor?.user?.first_name ?? ""} ${
+    appointment?.doctor?.user?.last_name ?? ""
+  }`.trim();
 
-  return fullName || appointment?.doctor?.user?.username || t("records.doctorFallback");
+  return (
+    fullName ||
+    appointment?.doctor?.user?.username ||
+    t("records.doctorFallback")
+  );
 };
 
 function Pending() {
@@ -32,9 +36,9 @@ function Pending() {
           return;
         }
 
-        const pendingOnly = (Array.isArray(response.data) ? response.data : []).filter(
-          (appointment) => appointment?.status === "pending",
-        );
+        const pendingOnly = (
+          Array.isArray(response.data) ? response.data : []
+        ).filter((appointment) => appointment?.status === "pending");
 
         setPendingAppointments(pendingOnly);
       } catch {
@@ -65,7 +69,9 @@ function Pending() {
 
       <div className="record-card">
         {isLoading ? (
-          <div className="record-empty-state">{t("records.loadingPending")}</div>
+          <div className="record-empty-state">
+            {t("records.loadingPending")}
+          </div>
         ) : loadError ? (
           <div className="record-empty-state">{loadError}</div>
         ) : pendingAppointments.length ? (
@@ -83,9 +89,12 @@ function Pending() {
                   </div>
 
                   <span className="record-status-pill record-status-pending">
-                    {t(`status.${String(appointment.status ?? "").toLowerCase()}`, {
-                      defaultValue: appointment.status,
-                    })}
+                    {t(
+                      `status.${getAppointmentStatusTranslationKey(appointment.status)}`,
+                      {
+                        defaultValue: appointment.status,
+                      },
+                    )}
                   </span>
                 </div>
 
@@ -102,9 +111,7 @@ function Pending() {
             ))}
           </div>
         ) : (
-          <div className="record-empty-state">
-            {t("records.noPending")}
-          </div>
+          <div className="record-empty-state">{t("records.noPending")}</div>
         )}
       </div>
     </section>

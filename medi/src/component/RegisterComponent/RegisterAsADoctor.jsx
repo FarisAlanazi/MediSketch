@@ -3,6 +3,8 @@ import "../../GeneralStyles/GeneralStyles.css";
 import { Link } from "react-router-dom";
 import Registration from "../../Auth/RegistrationLogic";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+
 function RegisterAsADoctor() {
   const { t } = useTranslation();
   const [user, setUser] = useState({
@@ -25,7 +27,19 @@ function RegisterAsADoctor() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    Registration({ ...user });
+    if (
+      user.phone_number.length > 10 ||
+      user.password.length < 8 ||
+      !user.first_name ||
+      !user.last_name ||
+      !user.email ||
+      !user.username
+    ) {
+      toast.error(t("auth.fillAllFields"));
+      return;
+    } else {
+      Registration({ ...user });
+    }
   };
 
   return (
