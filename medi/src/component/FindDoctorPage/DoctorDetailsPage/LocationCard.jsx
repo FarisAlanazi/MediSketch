@@ -11,7 +11,7 @@ const parseCoordinate = (value) => {
     return null;
   }
 
-  const parsedValue = Number.parseFloat(String(value).replace(/[^\d.-]/g, ""));
+  const parsedValue = Number.parseFloat(String(value).replace(/[^\d.-]/g, "")); // regex  to remove non-numeric values.
   return Number.isFinite(parsedValue) ? parsedValue : null;
 };
 

@@ -60,6 +60,7 @@ function DoctorProfile() {
   const [loadError, setLoadError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [medicalIdTouched, setMedicalIdTouched] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState(null); // This keeps the selected doctor photo ready for upload without changing the existing form state shape.
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,6 +73,10 @@ function DoctorProfile() {
       latitude,
       longitude,
     }));
+  };
+
+  const handleProfileImageChange = (event) => {
+    setProfileImageFile(event.target.files?.[0] ?? null); // This stores only the chosen image file so the existing text fields keep working as before.
   };
 
   useEffect(() => {
@@ -213,6 +218,12 @@ function DoctorProfile() {
         longitude: toNullableNumber(doctorForm.longitude),
       });
 
+      if (profileImageFile) {
+        const profileImageFormData = new FormData(); // This sends the doctor image through multipart form data without changing the current doctor JSON update flow.
+        profileImageFormData.append("profile_image", profileImageFile);
+        await api.patch(`/doctors/${doctorForm.userId}/`, profileImageFormData);
+      }
+
       toast.success(t("doctorProfile.success"));
     } catch (error) {
       toast.error(getErrorMessage(error, t("doctorProfile.saveError")));
@@ -250,6 +261,7 @@ function DoctorProfile() {
         <p>{t("doctorProfile.pageLabel")}</p>
         <h1>{t("doctorProfile.pageTitle")}</h1>
         <span>{t("doctorProfile.pageSubtitle")}</span>
+        <span>Userid : {doctorForm.userId}</span>
       </header>
 
       <form
@@ -421,6 +433,17 @@ function DoctorProfile() {
                   {t("doctorProfile.medicalIdError")}
                 </span>
               ) : null}
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="profile_image">Profile Image</label>
+              <input
+                type="file"
+                name="profile_image"
+                id="profile_image"
+                accept="image/*"
+                onChange={handleProfileImageChange}
+              />
             </div>
 
             <div className="profile-field-wide">

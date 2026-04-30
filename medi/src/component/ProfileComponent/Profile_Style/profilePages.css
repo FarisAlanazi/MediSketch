@@ -238,9 +238,10 @@
   inset: 0;
   display: flex;
   align-items: flex-start;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0.85rem;
   background: linear-gradient(180deg, rgba(16, 33, 63, 0.08), transparent 26%);
+  pointer-events: none;
 }
 
 .profile-map-overlay span {
@@ -250,6 +251,26 @@
   color: #ffffff;
   font-size: 0.8rem;
   font-weight: 700;
+}
+
+.profile-map-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  pointer-events: auto;
+}
+
+.profile-map-zoom-button {
+  width: 2.3rem;
+  height: 2.3rem;
+  border: none;
+  border-radius: 0.85rem;
+  background: rgba(16, 33, 63, 0.82);
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .profile-map-note,

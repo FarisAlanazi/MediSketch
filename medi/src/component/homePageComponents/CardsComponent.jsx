@@ -41,6 +41,7 @@ const CardsComponent = () => {
             first_name={cardInfo.user.first_name}
             last_name={cardInfo.user.last_name}
             gender={cardInfo.user.gender}
+            img={cardInfo.profile_image}
             price={cardInfo.price}
             experience={cardInfo.years_of_experience}
             specialization={cardInfo.specialization}

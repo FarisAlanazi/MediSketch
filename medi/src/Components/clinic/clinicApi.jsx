@@ -11,8 +11,11 @@ const clinicBasePath = "/clinic";
 
 // This normalizes list-style backend responses into a plain array.
 const toArrayPayload = (value) =>
-  Array.isArray(value) ? value : Array.isArray(value?.results) ? value.results : [];
-
+  Array.isArray(value)
+    ? value
+    : Array.isArray(value?.results)
+      ? value.results
+      : [];
 // This helper extracts the clearest backend error message available.
 export const getClinicErrorMessage = (error, fallbackMessage) => {
   // This returns DRF detail errors when the backend sends them.

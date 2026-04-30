@@ -254,6 +254,7 @@ export default function Doctors() {
               key={doctor.id}
               firstname={doctor.view.firstname}
               lastname={doctor.view.lastname}
+              img={doctor.profile_image}
               gender={doctor.view.gender}
               specialization={doctor.view.specialization}
               experience={doctor.view.experience}

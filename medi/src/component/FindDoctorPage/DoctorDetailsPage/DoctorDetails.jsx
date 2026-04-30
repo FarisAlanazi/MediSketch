@@ -270,6 +270,7 @@ function DoctorDetails() {
 
   const doctorName = getDoctorName(doctorDetails);
   const doctorLocation = getDoctorLocation(doctorDetails);
+  const doctorImage = doctorDetails.profile_image || fallbackDoctorImg;
 
   return (
     <section className="doctor-details-page">
@@ -280,7 +281,7 @@ function DoctorDetails() {
               <div className="doctor-hero-layout">
                 <div className="doctor-hero-image-shell">
                   <img
-                    src={fallbackDoctorImg}
+                    src={doctorImage}
                     alt={doctorName}
                     className="doctor-hero-image"
                   />
@@ -293,7 +294,7 @@ function DoctorDetails() {
                     </p>
                   ) : null}
 
-                  <h1>{doctorName || t("doctorDetails.profileFallback")}</h1>
+                  <h1>{doctorName || t("doctorDetails.profileFallback")} </h1>
                   <p className="doctor-location-line">
                     {doctorLocation || t("doctorDetails.locationNotListed")}
                   </p>

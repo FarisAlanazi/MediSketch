@@ -1,4 +1,4 @@
-import img from "../../assets/doctor-with-his-arms-crossed-white-background.jpg";
+import fallbackDoctorImg from "../../assets/doctor-with-his-arms-crossed-white-background.jpg";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -16,6 +16,7 @@ export default function DoctorCards({
   price,
   specialization,
   lastname,
+  img,
   gender,
   experience,
   rating,
@@ -25,6 +26,7 @@ export default function DoctorCards({
   id,
 }) {
   const { t } = useTranslation();
+  const imgSrc = img || fallbackDoctorImg;
   const hasRating = Number.isFinite(rating);
   const hasPrice = Number.isFinite(price);
   const hasExperience = Number.isFinite(experience);
@@ -51,7 +53,7 @@ export default function DoctorCards({
 
       <div className="doctor-card-main">
         <img
-          src={img}
+          src={imgSrc}
           alt={`${firstname} ${lastname}`}
           className="doctor-card-image"
         />

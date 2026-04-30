@@ -77,9 +77,7 @@ function DrDashboard() {
       }
 
       // This keeps only pending clinic requests in the doctor dashboard section.
-      const pendingClinicRequests = (
-        Array.isArray(response) ? response : []
-      )
+      const pendingClinicRequests = (Array.isArray(response) ? response : [])
         .filter((request) => {
           const requestStatus = normalizeClinicRequestStatus(request?.status);
           return !requestStatus || requestStatus === "pending";
@@ -88,6 +86,7 @@ function DrDashboard() {
           ...request,
           clinicDisplayName: getClinicRequestClinicName(request),
         }));
+      console.log(pendingClinicRequests);
 
       setClinicRequests(pendingClinicRequests);
     } catch (error) {
@@ -168,8 +167,9 @@ function DrDashboard() {
       }
 
       // This removes the handled request so the pending list updates without reloading the whole dashboard.
-      setClinicRequests((currentRequests) =>
-        currentRequests.filter((request) => request.id !== requestId),
+      setClinicRequests(
+        (currentRequests) =>
+          currentRequests.filter((request) => request.id !== requestId), //create a new list without the handled req
       );
     } catch (error) {
       toast.error(

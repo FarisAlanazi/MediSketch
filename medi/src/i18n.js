@@ -229,6 +229,8 @@ const resources = {
         empty: "No available times are listed for this doctor right now.",
         loginBeforeBooking: "Please log in before booking an appointment.",
         selectTime: "Please select one of the available times.",
+        upcomingAppointmentWithDoctor:
+          "You already have an upcoming appointment with this doctor. You can book again after the appointment time has passed.",
         success: "Your appointment request was submitted successfully.",
         successToast: "Appointment booked successfully!",
         submitError: "We could not submit the appointment request.",
@@ -573,6 +575,8 @@ const resources = {
         empty: "لا توجد أوقات متاحة لهذا الطبيب حالياً.",
         loginBeforeBooking: "يرجى تسجيل الدخول قبل حجز موعد.",
         selectTime: "يرجى اختيار أحد الأوقات المتاحة.",
+        upcomingAppointmentWithDoctor:
+          "لديك موعد قادم بالفعل مع هذا الطبيب. يمكنك الحجز مرة أخرى بعد انتهاء وقت الموعد.",
         success: "تم إرسال طلب الموعد بنجاح.",
         successToast: "تم حجز الموعد بنجاح!",
         submitError: "تعذر إرسال طلب الموعد.",

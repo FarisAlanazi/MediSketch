@@ -19,13 +19,15 @@ const getErrorMessage = (error, fallbackMessage) => {
 };
 
 const formatAppointmentLabel = (appointment, language, t) => {
-  const parsedDate = new Date(`${appointment.date}T${appointment.time}`);
+  //this appears in the comment you are going to publish.
+  const parsedDate = new Date(`${appointment.date}T${appointment.time}`); //combine date and time to be in one obj.
 
   if (Number.isNaN(parsedDate.getTime())) {
-    return `${appointment.date} ${t("reviews.at")} ${String(appointment.time).slice(0, 5)}`;
+    return `${appointment.date} ${t("reviews.at")} ${String(appointment.time).slice(0, 5)}`; //time slice will return : 13:30 and this is 5 charts
   }
 
   return parsedDate.toLocaleString(language, {
+    //"Thu, Apr 30, 2:30 PM"
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -59,14 +61,18 @@ function Reviews({
     type: "",
     text: "",
   });
-  const reviewedAppointmentIds = (feedbackEntries ?? []).map((feedbackEntry) =>
-    String(feedbackEntry?.appointment),
-  ); // Build a simple list of already-reviewed appointment ids so the same appointment cannot be reviewed twice.
+
+  // This finds the IDs of appointments that already have feedback so they can be excluded from the review form.
+  const reviewedAppointmentIds = (feedbackEntries ?? []).map(
+    (feedbackEntry) => String(feedbackEntry?.appointment), //converts the id into string.
+  );
+
   const eligibleAppointments = doctorAppointments.filter(
     (appointment) =>
       isAcceptedAppointmentStatus(appointment?.status) &&
       !reviewedAppointmentIds.includes(String(appointment.id)),
-  ); // Keep only accepted appointments that are not already reviewed because the frontend rating flow must depend on acceptance.
+  );
+
   const hasAcceptedAppointments = doctorAppointments.some((appointment) =>
     isAcceptedAppointmentStatus(appointment?.status),
   ); // Check whether the patient has any accepted appointment with this doctor before showing the review form state.
