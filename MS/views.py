@@ -153,6 +153,15 @@ class CheckSessionView(APIView):
             doctor.city = data.get('city', doctor.city)
             doctor.latitude = data.get('latitude', doctor.latitude)
             doctor.longitude = data.get('longitude', doctor.longitude)
+            spec_id = data.get('specialization')
+            if spec_id:
+                if spec_id == "empty":
+                    doctor.specialization = None
+                else:
+                    spec_obj = (Specialization.objects.filter(id=spec_id).first() or
+                                Specialization.objects.filter(name=spec_id).first())
+                    if spec_obj:
+                        doctor.specialization = spec_obj
 
             doctor.save()
         return Response(self.get(request).data, status=status.HTTP_200_OK)
