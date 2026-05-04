@@ -116,7 +116,6 @@ def create_user_profile(sender, instance, created, **kwargs):
             Doctor.objects.create(user=instance)
         elif instance.user_type == 'patient':
             Patient.objects.create(user=instance)
-        # UPDATED: Auto-create a clinic profile when a Clinic user registers
         elif instance.user_type == 'clinic':
             Clinic.objects.create(user=instance, name=f"{instance.username} Clinic")
 

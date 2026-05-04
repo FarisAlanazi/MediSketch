@@ -42,4 +42,5 @@ urlpatterns = [
     path('clinic/doctors/<int:doctor_id>/availability/<int:slot_id>/', ClinicDashboardAvailabilityDetailView.as_view(),
          name='clinic-dashboard-avail-update'),
     path('clinic/profile/', CheckSessionView.as_view(), name='clinic-profile'),
+    path('clinic/register/', User_view.as_view({'post': 'create'}), name='clinic-register'),
 ]

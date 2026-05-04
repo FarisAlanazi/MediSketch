@@ -3,9 +3,11 @@ from .models import Patient, Doctor, Clinic, Available, Appointment, Specializat
 import re
 from django.db.models import Avg
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
+        # Ensure user_type is in the fields list
         fields = ('id', 'username', 'email', 'first_name', 'last_name', 'password', 'phone_number', 'user_type')
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -15,7 +17,15 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        # 1. Extract the user_type
+        user_type = validated_data.get('user_type', 'patient')
+
+        # 2. Create the user object[cite: 5]
         user = CustomUser.objects.create_user(**validated_data)
+
+        # 3. Force the user_type and save
+        user.user_type = user_type
+        user.save()
         return user
 
 class PatientSerializer(serializers.ModelSerializer):
