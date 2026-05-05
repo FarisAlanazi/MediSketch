@@ -5,6 +5,7 @@ import saudiCities from "../../constants/saudiCities";
 import { useTranslation } from "react-i18next";
 import { isDoctorProfileComplete } from "../../utils/doctorVisibility.jsx";
 import { getAcceptedClinicName } from "../../utils/clinicRequestHelpers";
+import { useSearchParams } from "react-router-dom";
 import "./findDoctorPage.css";
 
 const normalizeText = (value) =>
@@ -56,8 +57,9 @@ const mapDoctorForView = (doctor) => ({
 
 export default function Doctors() {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [doctors, setDoctors] = useState([]);
-  const [searchName, setSearchName] = useState("");
+  const [searchName, setSearchName] = useState(searchParams.get("search") ?? "");
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedGender, setSelectedGender] = useState("all");
   const [selectedMinRating, setSelectedMinRating] = useState("all");
@@ -75,6 +77,10 @@ export default function Doctors() {
   useEffect(() => {
     getAllDoctors();
   }, []);
+
+  useEffect(() => {
+    setSearchName(searchParams.get("search") ?? "");
+  }, [searchParams]);
 
   const preparedDoctors = useMemo(
     () =>
@@ -101,6 +107,7 @@ export default function Doctors() {
 
   const filteredDoctors = useMemo(() => {
     //
+    const normalizedSearchValue = normalizeText(searchName);
 
     //normalizatrion code for filtering
     return preparedDoctors.filter((doctor) => {
@@ -108,14 +115,17 @@ export default function Doctors() {
       const normalizedDoctorName = normalizeText(
         `${doctor.view.firstname} ${doctor.view.lastname}`, //uses view cuz it uses the cleaned and normalized values
       );
-
+      const normalizedSpecialization = normalizeText(doctor.view.specialization);
+      const normalizedClinicName = normalizeText(doctor.view.clinicName);
       const normalizedCity = normalizeText(doctor.view.city);
 
       const normalizedGender = normalizeText(doctor.view.gender);
 
       const passesName =
-        normalizeText(searchName) === "" ||
-        normalizedDoctorName.includes(normalizeText(searchName)); //ha -> will show doctors with similar letters
+        normalizedSearchValue === "" ||
+        normalizedDoctorName.includes(normalizedSearchValue) ||
+        normalizedSpecialization.includes(normalizedSearchValue) ||
+        normalizedClinicName.includes(normalizedSearchValue); //ha -> will show doctors with similar letters
       const passesCity =
         selectedCity === "all" ||
         normalizedCity === normalizeText(selectedCity);
@@ -188,7 +198,7 @@ export default function Doctors() {
               <option value="all">{t("doctors.allCities")}</option>
               {saudiCities.map((city) => (
                 <option key={city} value={city}>
-                  {city}
+                  {t(`cities.${city}`, { defaultValue: city })}
                 </option>
               ))}
             </select>

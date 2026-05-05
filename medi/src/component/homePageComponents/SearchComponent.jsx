@@ -2,9 +2,22 @@ import { useState } from "react";
 import "../../SearchAndCardStyle/searchComponentStyle.css";
 import doctorImg from "../../assets/imgs/DoctorOnPhone.png";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 function SearchComponent() {
   const { t } = useTranslation();
-  const [searchValue, setSearchValue] = useState();
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const normalizedSearchValue = searchValue.trim();
+    navigate(
+      normalizedSearchValue
+        ? `/findDoctor?search=${encodeURIComponent(normalizedSearchValue)}`
+        : "/findDoctor",
+    );
+  };
+
   return (
     <div className="container">
       <div className="divWithInput">
@@ -12,7 +25,7 @@ function SearchComponent() {
           {t("hero.titleStart")} <span>{t("hero.titleHighlight")}</span>
         </h1>
         <p id="paragraph">{t("hero.description")}</p>
-        <div className="searchShell">
+        <form className="searchShell" onSubmit={handleSubmit}>
           <input
             type="search"
             value={searchValue}
@@ -20,18 +33,14 @@ function SearchComponent() {
             placeholder={t("hero.placeholder")}
             aria-label={t("hero.aria")}
           />
-          <span className="searchShellButton" aria-hidden="true">
+          <button type="submit" className="searchShellButton">
             {t("hero.button")}
-          </span>
-        </div>
+          </button>
+        </form>
         <p className="searchHelperNote">{t("hero.helper")}</p>
       </div>
       <div className="imgClass">
-        <img
-          src={doctorImg}
-          alt={t("hero.imageAlt")}
-          className="doctorImg"
-        />
+        <img src={doctorImg} alt={t("hero.imageAlt")} className="doctorImg" />
       </div>
     </div>
   );

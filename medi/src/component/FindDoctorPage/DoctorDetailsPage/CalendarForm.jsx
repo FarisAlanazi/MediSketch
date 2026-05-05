@@ -18,14 +18,15 @@ const getErrorMessage = (error, fallbackMessage) => {
 };
 
 const formatSlotLabel = (slot, language, t) => {
+  //booking calendar.
   const parsedDate = new Date(`${slot.date}T${slot.time}`);
 
   if (Number.isNaN(parsedDate.getTime())) {
-    return `${slot.date} ${t("booking.at")} ${String(slot.time).slice(0, 5)}`;
+    return `${slot.date} ${t("booking.at")} ${String(slot.time).slice(0, 5)}`; //edge case where the date still readable.
   }
 
   return parsedDate.toLocaleString(language, {
-    weekday: "short",
+    weekday: "long",
     month: "short",
     day: "numeric",
     hour: "numeric",
@@ -38,8 +39,10 @@ function CalendarForm({ doctor }) {
   const { isAuthenticated, user } = useAuth();
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlotId, setSelectedSlotId] = useState("");
-  const [hasUpcomingAppointmentWithDoctor, setHasUpcomingAppointmentWithDoctor] =
-    useState(false);
+  const [
+    hasUpcomingAppointmentWithDoctor,
+    setHasUpcomingAppointmentWithDoctor,
+  ] = useState(false);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,36 +77,50 @@ function CalendarForm({ doctor }) {
           return;
         }
 
-        const doctorSlots = (Array.isArray(slotsResponse.data) ? slotsResponse.data : [])
-          .filter(
-            (slot) =>
-              String(slot?.doctor) === String(doctor.id) &&
-              slot?.status === true,
-          )
-          .sort(
-            (left, right) =>
-              new Date(`${left.date}T${left.time}`) -
-              new Date(`${right.date}T${right.time}`),
-          );
-        const appointments = Array.isArray(appointmentsResponse.data)
+        const doctorSlots = //show the avilable slots for the doc
+          (Array.isArray(slotsResponse.data) ? slotsResponse.data : [])
+            .filter(
+              (slot) =>
+                String(slot?.doctor) === String(doctor.id) &&
+                slot?.status === true, //available slots only.
+            )
+            .sort(
+              //sort the slots based on the date and time.
+              (left, right) =>
+                new Date(`${left.date}T${left.time}`) -
+                new Date(`${right.date}T${right.time}`),
+            );
+
+        const appointments = Array.isArray(appointmentsResponse.data) //check the appointments already booked appointments contains {DOCTOR AND PATIENT}
           ? appointmentsResponse.data
           : Array.isArray(appointmentsResponse.data?.results)
             ? appointmentsResponse.data.results
             : [];
+
         const activeStatuses = ["pending", "accepted"];
+
         const now = new Date();
+
         const hasUpcomingAppointment = appointments.some((appointment) => {
-          const appointmentDoctorId = appointment?.doctor?.id ?? appointment?.doctor;
-          const appointmentStatus = String(appointment?.status ?? "").toLowerCase();
+          //appointments where the book appointments resides.
+          const appointmentDoctorId =
+            appointment?.doctor?.id ?? appointment?.doctor;
+
+          const appointmentStatus = String(
+            //check on the status. if the appointment is accepted or pending it will be shown as upcoming.
+            appointment?.status ?? "",
+          ).toLowerCase();
 
           if (
             String(appointmentDoctorId) !== String(doctor.id) ||
             !activeStatuses.includes(appointmentStatus)
           ) {
             return false;
-          }
+          } //an edge case, check if the appointment does not belong to the doc OR the appointment has not initiated or pending.
 
-          const appointmentDateTime = new Date(`${appointment.date}T${appointment.time}`);
+          const appointmentDateTime = new Date(
+            `${appointment.date}T${appointment.time}`,
+          );
 
           if (Number.isNaN(appointmentDateTime.getTime())) {
             return false;
@@ -113,8 +130,8 @@ function CalendarForm({ doctor }) {
         });
 
         setAvailableSlots(doctorSlots);
-        setSelectedSlotId(doctorSlots[0] ? String(doctorSlots[0].id) : "");
-        setHasUpcomingAppointmentWithDoctor(hasUpcomingAppointment);
+        setSelectedSlotId(doctorSlots[0] ? String(doctorSlots[0].id) : ""); // AUTO SELECT THE FIRST AVAILABLE SLOT IF EXISTS.
+        setHasUpcomingAppointmentWithDoctor(hasUpcomingAppointment); //save wather the user has an upcoming appointment with the doctor to prevent multiple bookings.
       } catch {
         if (!isMounted) {
           return;
@@ -209,6 +226,8 @@ function CalendarForm({ doctor }) {
     }
   };
 
+  console.log(availableSlots, "  available slots");
+
   return (
     <form className="details-card booking-card" onSubmit={handleSubmission}>
       <p className="details-card-label">{t("booking.label")}</p>
@@ -230,6 +249,7 @@ function CalendarForm({ doctor }) {
       ) : availableSlots.length ? (
         <label className="booking-field">
           <span>{t("booking.fieldLabel")}</span>
+
           <select
             name="slot"
             value={selectedSlotId}

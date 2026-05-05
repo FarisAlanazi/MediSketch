@@ -80,13 +80,15 @@ function DrDashboard() {
       const pendingClinicRequests = (Array.isArray(response) ? response : [])
         .filter((request) => {
           const requestStatus = normalizeClinicRequestStatus(request?.status);
+          console.log(requestStatus, "Clinic requests"); // all prev and current requests status,
+
           return !requestStatus || requestStatus === "pending";
         })
         .map((request) => ({
           ...request,
           clinicDisplayName: getClinicRequestClinicName(request),
         }));
-      console.log(pendingClinicRequests);
+      console.log(pendingClinicRequests); //an array of pending clinic reqs.
 
       setClinicRequests(pendingClinicRequests);
     } catch (error) {

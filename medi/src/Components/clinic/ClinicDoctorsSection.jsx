@@ -4,11 +4,16 @@ import ClinicDoctorCard from "./ClinicDoctorCard";
 // This component renders the clinic doctor list only.
 function ClinicDoctorsSection({
   doctors,
+  appointments,
   clinicName,
   onRemoveDoctor,
   onSaveAvailability,
+  onUpdateAppointmentStatus,
   removingDoctorId,
   savingAvailabilityDoctorId,
+  processingAppointmentId,
+  processingAppointmentStatus,
+  rejectAppointmentStatus,
 }) {
   // This renders a clear empty state when the clinic has no linked doctors.
   if (!doctors.length) {
@@ -53,11 +58,18 @@ function ClinicDoctorsSection({
         <ClinicDoctorCard
           key={doctor.id}
           doctor={doctor}
+          appointments={appointments.filter(
+            (appointment) => appointment?.doctor?.id === doctor.id,
+          )}
           clinicName={clinicName}
           onRemoveDoctor={onRemoveDoctor}
           onSaveAvailability={onSaveAvailability}
+          onUpdateAppointmentStatus={onUpdateAppointmentStatus}
           isRemoving={removingDoctorId === doctor.id}
           isSavingAvailability={savingAvailabilityDoctorId === doctor.id}
+          processingAppointmentId={processingAppointmentId}
+          processingAppointmentStatus={processingAppointmentStatus}
+          rejectAppointmentStatus={rejectAppointmentStatus}
         />
       ))}
     </section>

@@ -34,6 +34,20 @@ function ClinicRegisterForm({ onRegisterSuccess }) {
       setFormError("Username, password, and clinic name are required.");
       return;
     }
+    if (clinicForm.password.length < 8) {
+      setFormError("Password must be at least 8 characters long.");
+      return;
+    }
+    if (
+      clinicForm.Health_Facility_License.length < 11 ||
+      clinicForm.Health_Facility_License.length > 14 ||
+      !clinicForm.Health_Facility_License.startsWith("10990")
+    ) {
+      setFormError(
+        "Health Facility License number must be between 11 and 14 digits and start with '10990'.",
+      );
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -99,7 +113,7 @@ function ClinicRegisterForm({ onRegisterSuccess }) {
         type="text"
         value={clinicForm.username}
         onChange={handleChange}
-        placeholder="citycareclinic"
+        placeholder="MabasemClinic123"
       />
 
       <label htmlFor="clinic-email" className="form-label">

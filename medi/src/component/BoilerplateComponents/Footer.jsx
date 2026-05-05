@@ -1,7 +1,7 @@
 import "./FooterAndNavStyles/footerStyle.css";
 import img from "../../assets/imgs/globalIcon.png";
 import { useTranslation } from "react-i18next";
-
+import { Link } from "react-router-dom";
 const Footer = () => {
   const { t } = useTranslation();
 
@@ -33,6 +33,24 @@ const Footer = () => {
           <a href="">Twitter</a>
         </article>
       </div>
+      <article
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        className="footer-info"
+      >
+        <h4 style={{ marginBottom: "0.5rem" }}>
+          <Link to="/complaints">Complains and Suggestions </Link>
+        </h4>
+        <img
+          src="../../../public/complain.png"
+          alt=""
+          style={{ width: "40px", height: "40px" }}
+        />
+      </article>
       <div className="footer-bottom">
         <p>{t("footer.copyright")}</p>
       </div>

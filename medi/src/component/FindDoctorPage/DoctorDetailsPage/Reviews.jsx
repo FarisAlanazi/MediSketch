@@ -117,17 +117,22 @@ function Reviews({
               String(appointment?.doctor?.id) === String(doctorId),
           )
           .sort(
-            (left, right) =>
-              new Date(`${right.date}T${right.time}`) -
+            (
+              left,
+              right, //newer appointments first.
+            ) =>
+              new Date(`${right.date}T${right.time}`) - // compare the data of right and left , then the nerwer one will be first.
               new Date(`${left.date}T${left.time}`),
           );
+
         const firstEligibleAppointment = matchedAppointments.find(
           (appointment) =>
-            isAcceptedAppointmentStatus(appointment?.status) &&
+            isAcceptedAppointmentStatus(appointment?.status) && //get the accepted appointments that have not been reviewed yet
             !reviewedAppointmentIds.includes(String(appointment.id)),
-        ); // Read the first accepted reviewable appointment once so the code stays simple and avoids repeated search work.
+        );
 
         setDoctorAppointments(matchedAppointments);
+
         setFeedbackForm((currentForm) => ({
           ...currentForm,
           appointment: firstEligibleAppointment
@@ -203,7 +208,7 @@ function Reviews({
 
       setFeedbackForm((currentForm) => ({
         ...currentForm,
-        rating: "5",
+        rating: "5", //starts with
         feedback: "",
       }));
       setFormStatus({

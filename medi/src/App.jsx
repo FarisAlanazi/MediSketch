@@ -22,6 +22,7 @@ import DoctorDetails from "./component/FindDoctorPage/DoctorDetailsPage/DoctorDe
 import DiscoverDoctorsMap from "./Pages/DiscoverDoctorsMap";
 import { useTranslation } from "react-i18next";
 import Clinicpage from "./Pages/Clinicpage";
+import Complaints from "./component/complain/Complaints";
 
 function App() {
   const { i18n } = useTranslation();
@@ -134,6 +135,8 @@ function App() {
         <Route path="DoctorDetails/:id" element={<DoctorDetails />} />
 
         <Route path="clinic" element={<Clinicpage />} />
+
+        <Route path="/complaints" element={<Complaints />} />
 
         <Route
           path="*"

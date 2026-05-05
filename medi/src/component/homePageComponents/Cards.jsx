@@ -56,10 +56,16 @@ const Cards = ({
           <section className="doctor-card-content">
             <h4>{`${first_name} ${last_name}`}</h4>
             {city ? (
-              <p className="card-location">{city}</p>
+              <p className="card-location">
+                {t(`cities.${city}`, { defaultValue: city })}
+              </p>
             ) : null}
             {/* This shows the clinic name only when the doctor is linked to one. */}
-            {clinicName ? <p className="card-location">Clinic: {clinicName}</p> : null}
+            {clinicName ? (
+              <p className="card-location">
+                {t("doctors.clinicLabel")}: {clinicName}
+              </p>
+            ) : null}
             <div className="doctor-card-meta">
               {experience ? (
                 <span>

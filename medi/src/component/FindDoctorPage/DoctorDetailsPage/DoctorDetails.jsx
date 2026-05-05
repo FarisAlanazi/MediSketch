@@ -39,7 +39,7 @@ const extractFeedbackDoctorKeys = (feedback) =>
     feedback?.doctor?.user,
     feedback?.doctor?.user?.id,
   ]
-    .filter(Boolean)
+    .filter(Boolean) //remove falsy values " 0 , '', null, undefined"
     .map((value) => String(value));
 
 const extractFeedbackRating = (feedback) =>
@@ -68,13 +68,8 @@ const extractFeedbackDate = (feedback) =>
   null;
 
 const extractReviewerName = (feedback) =>
-  feedback?.user?.username ??
-  feedback?.patient?.username ??
-  feedback?.reviewer?.username ??
-  feedback?.username ??
-  feedback?.user_name ??
-  feedback?.name ??
-  "";
+  feedback?.user?.first_name ?? feedback?.user?.username ?? "";
+("");
 
 const formatReviewDate = (value, language) => {
   if (!value) {
@@ -195,6 +190,7 @@ function DoctorDetails() {
   }, [id, t]);
 
   const doctorFeedbacks = useMemo(() => {
+    // keep feedbacks that are related to this particular doc.
     if (!doctorDetails) {
       return [];
     }

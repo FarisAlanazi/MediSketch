@@ -77,6 +77,7 @@ function DoctorProfile() {
 
   const handleProfileImageChange = (event) => {
     setProfileImageFile(event.target.files?.[0] ?? null); // This stores only the chosen image file so the existing text fields keep working as before.
+    console.log(event.target?.files, " img ");
   };
 
   useEffect(() => {
@@ -105,6 +106,9 @@ function DoctorProfile() {
         }
 
         const doctorResponse = doctorResult.value.data ?? {};
+
+        console.log(doctorResponse, "Doctor response");
+
         const specializationOptions =
           specializationsResult.status === "fulfilled" &&
           Array.isArray(specializationsResult.value.data)
@@ -219,7 +223,7 @@ function DoctorProfile() {
       });
 
       if (profileImageFile) {
-        const profileImageFormData = new FormData(); // This sends the doctor image through multipart form data without changing the current doctor JSON update flow.
+        const profileImageFormData = new FormData(); // This sends the doctor image, JSON cannot carry files data.
         profileImageFormData.append("profile_image", profileImageFile);
         await api.patch(`/doctors/${doctorForm.userId}/`, profileImageFormData);
       }
@@ -407,7 +411,7 @@ function DoctorProfile() {
                 <option value="">{t("doctorProfile.selectCity")}</option>
                 {saudiCities.map((city) => (
                   <option key={city} value={city}>
-                    {city}
+                    {t(`cities.${city}`, { defaultValue: city })}
                   </option>
                 ))}
               </select>

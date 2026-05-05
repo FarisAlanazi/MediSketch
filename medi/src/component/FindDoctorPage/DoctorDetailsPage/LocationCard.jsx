@@ -42,8 +42,8 @@ function LocationCard({ doctorName, locationLabel, latitude, longitude }) {
   const hasExactLocation =
     parsedLatitude !== null &&
     parsedLongitude !== null &&
-    Math.abs(parsedLatitude) <= 90 &&
-    Math.abs(parsedLongitude) <= 180;
+    Math.abs(parsedLatitude) <= 90 && //lat must be in range of -90 to 90.
+    Math.abs(parsedLongitude) <= 180; //long must be in range of -180 to 180.
 
   return (
     <section className="details-card map-card">

@@ -68,12 +68,16 @@ export default function DoctorCards({
           </h2>
 
           <p className="doctor-location">
-            {city || t("doctors.locationNotListed")}
+            {city
+              ? t(`cities.${city}`, { defaultValue: city })
+              : t("doctors.locationNotListed")}
           </p>
 
           {/* This shows the clinic name only when the backend already provides one. */}
           {clinicName ? (
-            <p className="doctor-location">Clinic: {clinicName}</p>
+            <p className="doctor-location">
+              {t("doctors.clinicLabel")}: {clinicName}
+            </p>
           ) : null}
 
           <div className="doctor-card-meta">
@@ -102,7 +106,7 @@ export default function DoctorCards({
             <div className="doctor-availability">
               {availableDays.map((day) => (
                 <span key={`${id}-${day}`} className="availability-pill">
-                  {day}
+                  {t(`days.${day}`, { defaultValue: day })}
                 </span>
               ))}
             </div>
